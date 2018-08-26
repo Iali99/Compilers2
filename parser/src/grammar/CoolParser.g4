@@ -35,7 +35,7 @@ program returns 		[AST.program value]
 // List of all the classes
 class_list returns 		[List<AST.class_> value] 
 					    @init {
-					        $value = new ArrayList<>();
+					        $value = new ArrayList<AST.class>();
 					    }
 					    : 
 					    (cl = class_ SEMICOLON { $value.add($cl.value); })+;
@@ -44,22 +44,22 @@ class_list returns 		[List<AST.class_> value]
 class_ returns 			[AST.class_ value] 
     					: 
 					    // class without inheritance
-					    cl=CLASS t=TYPEID LBRACE fl=feature_list RBRACE {
+					    clss=CLASS type=TYPEID LBRACE fl=feature_list RBRACE {
 					        // By default "Object" class is parent of all class
-					        $value = new AST.class_($t.getText(), filename, "Object", 
-					                $fl.value, $cl.getLine());
+					        $value = new AST.class_($type.getText(), filename, "Object", 
+					                $fl.value, $clss.getLine());
 					    }
 					    |
 					    // class with inheritance
-					    cl=CLASS t=TYPEID (INHERITS pcl=TYPEID) LBRACE fl=feature_list RBRACE {
-					        $value = new AST.class_($t.getText(), filename, $pcl.getText(),
-					                $fl.value, $cl.getLine());
+					    clss=CLASS type=TYPEID INHERITS parent=TYPEID LBRACE fl=feature_list RBRACE {
+					        $value = new AST.class_($type.getText(), filename, $parent.getText(),
+					                $fl.value, $clss.getLine());
 					    };
 
 // list of features
 feature_list returns 	[List<AST.feature> value] 
 					    @init {
-					        $value = new ArrayList<>();
+					        $value = new ArrayList<AST.feature>();
 					    }
 					    : 
 					    (f = feature SEMICOLON { $value.add($f.value); })*;
@@ -68,9 +68,9 @@ feature_list returns 	[List<AST.feature> value]
 feature returns 		[AST.feature value]
 						: 
 					    // method without formal_list
-					    m=OBJECTID LPAREN RPAREN COLON t=TYPEID LBRACE b=expr RBRACE {
+					    m=OBJECTID LPAREN RPAREN COLON type=TYPEID LBRACE b=expr RBRACE {
 					        $value = new AST.method($m.getText(), new ArrayList<AST.formal>(), 
-					            $t.getText(), $b.value, $m.getLine());
+					            $type.getText(), $b.value, $m.getLine());
 					    }
 					    |
 					    // method with formal_list
@@ -92,7 +92,7 @@ feature returns 		[AST.feature value]
 // list of formals
 formal_list returns 	[List<AST.formal> value]
 					    @init {
-					        $value = new ArrayList<>();
+					        $value = new ArrayList<AST.formal>();
 					    }
 					    : 
 					    f=formal { $value.add($f.value); } 
@@ -108,7 +108,7 @@ formal returns 			[AST.formal value]
 // list branches of type case
 branch_list returns 	[List<AST.branch> value]
 					    @init {
-					        $value = new ArrayList<>();
+					        $value = new ArrayList<AST.branch>();
 					    }
 					    : 
 					    (b=branch { $value.add($b.value); })+;
@@ -123,7 +123,7 @@ branch returns 			[AST.branch value]
 // list of expressions ending with semicolon
 block_expr_list returns [List<AST.expression> value] 
 					    @init {
-					        $value = new ArrayList<>();
+					        $value = new ArrayList<AST.expression>();
 					    }
 					    : 
 					    (e=expr SEMICOLON { $value.add($e.value); } )+;
@@ -131,7 +131,7 @@ block_expr_list returns [List<AST.expression> value]
 // list of expressions separated by comma
 expr_list returns 		[List<AST.expression> value]
 					    @init {
-					        $value = new ArrayList<>();
+					        $value = new ArrayList<AST.expression>();
 					    }
 					    : 
 					    (
@@ -143,7 +143,7 @@ expr_list returns 		[List<AST.expression> value]
 // list of assignments in a let statement
 let_assgn_list returns 	[List<AST.attr> value]
 					    @init {
-					        $value = new ArrayList<>();
+					        $value = new ArrayList<AST.attr>();
 					    }
 					    : 
 					    f=first_let_assgn { $value.add($f.value); }
