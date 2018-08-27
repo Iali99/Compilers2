@@ -74,42 +74,35 @@ feature_list returns 	[ List<AST.feature> value ]
 // | OBJECTID COLON TYPEID ( ASSIGN expr )?
 feature returns 		[ AST.feature value ]
 						: 
-					    // method without formal_list
-					    fl1 = OBJECTID LPAREN RPAREN COLON type = TYPEID LBRACE b = expr RBRACE {
-					    	cur_ln = $fl1.getLine();
-					        $value  =  new AST.method($fl1.getText(), new ArrayList<AST.formal>(), 
-					            $type.getText(), $b.value, cur_ln);
-					    }
-					    |
-					    // method with formal_list
+					    // method with (formal_list)?
 					    fl1 = OBJECTID LPAREN f = formal_list RPAREN COLON type = TYPEID LBRACE b = expr RBRACE {
 					    	cur_ln = $fl1.getLine();
 					        $value  =  new AST.method($fl1.getText(), $f.value, $type.getText(), 
 					            $b.value, cur_ln);
 					    }
-					    // variable declaration without assignment
+					    // variable declaration without assignment expression
 					    | 
 					    fl2 = OBJECTID COLON t = TYPEID {
 					    	cur_ln = $fl2.getLine();
 					        $value  =  new AST.attr($fl2.getText(), $t.getText(), new AST.no_expr($v.getLine()),
 					            cur_ln);
 					    }
-					    // variable declaration with assignment
+					    // variable declaration with assignment expression
 					    | 
 					    fl2 = OBJECTID COLON type = TYPEID ( ASSIGN ex = expr ) {
 					    	cur_ln = $fl2.getLine();
 					        $value  =  new AST.attr($fl2.getText(), $type.getText(), $ex.value, cur_ln);
 					    };
-					    
+
 // list of formals
 formal_list returns 	[ List<AST.formal> value ]
 					    @init {
 					        $value  =  new ArrayList<AST.formal>();
 					    }
 					    : 
-					    f1 = formal { $value.add($f1.value); } 
-					    (COMMA f2 = formal { $value.add($f2.value); })*;
-
+					    ( 	f1 = formal { $value.add($f1.value); } 
+					    	(COMMA f2 = formal { $value.add($f2.value); })*
+					    )?;
 // variable declarations
 formal returns 			[ AST.formal value ] 
 						: 
