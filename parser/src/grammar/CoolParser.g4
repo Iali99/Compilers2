@@ -32,7 +32,8 @@ program returns 		[ AST.program value ]
 					        $value  =  new AST.program($cl.value, $cl.value.get(0).lineNo);    
 					    };                    
 
-// List of all the classes
+// call lists 
+// (class_ SEMICOLON)*;
 class_list returns 		[ List<AST.class_> value ] 
 					    @init {
 					        $value  =  new ArrayList<AST.class>();
@@ -40,13 +41,14 @@ class_list returns 		[ List<AST.class_> value ]
 					    : 
 					    (cl  =  class_ SEMICOLON { $value.add($cl.value); })+;
 
-// A single class
+// A class
+// CLASS TYPEID (INHERITS TYPEID)? LBRACE (feature SEMICOLON)* RBRACE;
 class_ returns 			[ AST.class_ value ] 
     					: 
-					    // class without inheritance
+					    // class with no inheritance
 					    clss = CLASS type = TYPEID LBRACE fl = feature_list RBRACE {
 					    	cur_ln = $clss.getLine();
-					        // By default "Object" class is parent of all class
+					        // taking "Object" as the parent class
 					        $value  =  new AST.class_($type.getText(), filename, "Object", 
 					                $fl.value, cur_ln);
 					    }
@@ -58,7 +60,8 @@ class_ returns 			[ AST.class_ value ]
 					                $fl.value, cur_ln);
 					    };
 
-// list of features
+// list of features used above
+// (feature SEMICOLON)*
 feature_list returns 	[ List<AST.feature> value ] 
 					    @init {
 					        $value  =  new ArrayList<AST.feature>();
@@ -66,7 +69,9 @@ feature_list returns 	[ List<AST.feature> value ]
 					    : 
 					    (fl  =  feature SEMICOLON { $value.add($fl.value); })*;
 
-// a function or variable declaration (with or without assignment)
+// a feature
+// OBJECTID LPAREN ( formal (COMMA formal)*)? RPAREN COLON TYPEID LBRACE expr RBRACE 
+// | OBJECTID COLON TYPEID ( ASSIGN expr )?
 feature returns 		[ AST.feature value ]
 						: 
 					    // method without formal_list
@@ -95,7 +100,7 @@ feature returns 		[ AST.feature value ]
 					    	cur_ln = $fl2.getLine();
 					        $value  =  new AST.attr($fl2.getText(), $type.getText(), $ex.value, cur_ln);
 					    };
-
+					    
 // list of formals
 formal_list returns 	[ List<AST.formal> value ]
 					    @init {
