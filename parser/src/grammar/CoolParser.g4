@@ -18,7 +18,7 @@ options {
     DO NOT EDIT THE FILE ABOVE THIS LINE
     Add member functions, variables below.
 */
-
+	int cur_ln;
 }
 
 /*
@@ -45,15 +45,17 @@ class_ returns 			[ AST.class_ value ]
     					: 
 					    // class without inheritance
 					    clss = CLASS type = TYPEID LBRACE fl = feature_list RBRACE {
+					    	cur_ln = $clss.getLine();
 					        // By default "Object" class is parent of all class
 					        $value  =  new AST.class_($type.getText(), filename, "Object", 
-					                $fl.value, $clss.getLine());
+					                $fl.value, cur_ln);
 					    }
 					    |
 					    // class with inheritance
 					    clss = CLASS type = TYPEID INHERITS parent = TYPEID LBRACE fl = feature_list RBRACE {
+					    	cur_ln = $clss.getLine();
 					        $value  =  new AST.class_($type.getText(), filename, $parent.getText(),
-					                $fl.value, $clss.getLine());
+					                $fl.value, cur_ln);
 					    };
 
 // list of features
@@ -69,25 +71,29 @@ feature returns 		[ AST.feature value ]
 						: 
 					    // method without formal_list
 					    fl1 = OBJECTID LPAREN RPAREN COLON type = TYPEID LBRACE b = expr RBRACE {
+					    	cur_ln = $fl1.getLine();
 					        $value  =  new AST.method($fl1.getText(), new ArrayList<AST.formal>(), 
-					            $type.getText(), $b.value, $fl1.getLine());
+					            $type.getText(), $b.value, cur_ln);
 					    }
 					    |
 					    // method with formal_list
 					    fl1 = OBJECTID LPAREN f = formal_list RPAREN COLON type = TYPEID LBRACE b = expr RBRACE {
+					    	cur_ln = $fl1.getLine();
 					        $value  =  new AST.method($fl1.getText(), $f.value, $type.getText(), 
-					            $b.value, $fl1.getLine());
+					            $b.value, cur_ln);
 					    }
 					    // variable declaration without assignment
 					    | 
 					    fl2 = OBJECTID COLON t = TYPEID {
+					    	cur_ln = $fl2.getLine();
 					        $value  =  new AST.attr($fl2.getText(), $t.getText(), new AST.no_expr($v.getLine()),
-					            $fl2.getLine());
+					            cur_ln);
 					    }
 					    // variable declaration with assignment
 					    | 
 					    fl2 = OBJECTID COLON type = TYPEID ( ASSIGN ex = expr ) {
-					        $value  =  new AST.attr($fl2.getText(), $type.getText(), $ex.value, $fl2.getLine());
+					    	cur_ln = $fl2.getLine();
+					        $value  =  new AST.attr($fl2.getText(), $type.getText(), $ex.value, cur_ln);
 					    };
 
 // list of formals
@@ -103,7 +109,8 @@ formal_list returns 	[ List<AST.formal> value ]
 formal returns 			[ AST.formal value ] 
 						: 
 					    forml = OBJECTID COLON type = TYPEID {
-					        $value  =  new AST.formal($forml.getText(), $type.getText(), $forml.getLine());
+					    	cur_ln = $forml.getLine();
+					        $value  =  new AST.formal($forml.getText(), $type.getText(), cur_ln);
 					    };
 
 // list branches of type case
@@ -118,7 +125,8 @@ branch_list returns 	[ List<AST.branch> value ]
 branch returns 			[ AST.branch value ] 
 						:
 					    o = OBJECTID COLON t = TYPEID DARROW e = expr SEMICOLON {
-					        $value  =  new AST.branch($o.getText(), $t.getText(), $e.value, $o.getLine());
+					    	cur_ln = $o.getLine();
+					        $value  =  new AST.branch($o.getText(), $t.getText(), $e.value, cur_ln);
 					    };
 
 // list of expressions ending with semicolon
@@ -147,29 +155,20 @@ let_assgn_list returns 	[ List<AST.attr> value ]
 					        $value  =  new ArrayList<AST.attr>();
 					    }
 					    : 
-					    f = first_let_assgn { $value.add($f.value); }
-					    ( la = nxt_let_assgn { $value.add($la.value); } )*;
+					    frst = let_assgn { $value.add($frst.value); }
+					    ( COMMA nxt_assgn = let_assgn { $value.add($nxt_assgn.value); } )*;
 
 // first varaible declaration in let statement (which doesnt start with comma)
-first_let_assgn returns	[ AST.attr value ]
+let_assgn returns	[ AST.attr value ]
 					    :
 					    o = OBJECTID COLON t = TYPEID {
-					        $value  =  new AST.attr($o.getText(), $t.getText(), new AST.no_expr($o.getLine()), $o.getLine());
+					    	cur_ln = $o.getLine();
+					        $value  =  new AST.attr($o.getText(), $t.getText(), new AST.no_expr($o.getLine()), cur_ln);
 					    }
 					    |
 					    o = OBJECTID COLON t = TYPEID ASSIGN e = expr {
-					        $value  =  new AST.attr($o.getText(), $t.getText(), $e.value, $o.getLine());
-					    };
-
-// variable declarations in let statement which starts with comma (2nd and further declarations)
-nxt_let_assgn returns 	[ AST.attr value ]
-					    :
-					    c = COMMA o = OBJECTID COLON t = TYPEID {
-					        $value  =  new AST.attr($o.getText(), $t.getText(), new AST.no_expr($c.getLine()), $c.getLine());
-					    }
-					    |
-					    c = COMMA o = OBJECTID COLON t = TYPEID ASSIGN e = expr{
-					        $value  =  new AST.attr($o.getText(), $t.getText(), $e.value, $c.getLine());
+					    	cur_ln = $o.getLine();
+					        $value  =  new AST.attr($o.getText(), $t.getText(), $e.value, cur_ln);
 					    };
 
 /* All kinds of expressions */
@@ -177,135 +176,147 @@ expr returns 			[ AST.expression value ]
 						: 
 				        // dispatch (a function call of an object)
 				        e1 = expr DOT oi = OBJECTID LPAREN el = expr_list RPAREN {
-				            $value  =  new AST.dispatch($e1.value, $oi.getText(), $el.value, $e1.value.lineNo);
+				        	cur_ln = $e1.value.lineNo;
+				            $value  =  new AST.dispatch($e1.value, $oi.getText(), $el.value, cur_ln);
 				        }
 				        | 
 				        // static dispatch
 				        e1 = expr ATSYM t = TYPEID DOT oi = OBJECTID LPAREN el = expr_list RPAREN {
+				        	cur_ln = $e1.value.lineNo;
 				            $value  =  new AST.static_dispatch($e1.value, $t.getText(), $oi.getText(), 
-				                $el.value, $e1.value.lineNo);
+				                $el.value, cur_ln);
 				        }
 				        | 
 				        // function call of self
 				        o = OBJECTID LPAREN el = expr_list RPAREN {
+				        	cur_ln = $o.getLine();
 				            $value  =  new AST.dispatch(new AST.object("self", $o.getLine()), $o.getText(),
-				                $el.value, $o.getLine());
+				                $el.value, cur_ln);
 				        }
 				        | 
 				        // if e2 then e2 else e3 fi
 				        i = IF e1 = expr THEN e2 = expr ELSE e3 = expr FI {
-				            $value  =  new AST.cond($e1.value, $e2.value, $e3.value, $i.getLine());
+				        	cur_ln = $i.getLine();
+				            $value  =  new AST.cond($e1.value, $e2.value, $e3.value, cur_ln);
 				        }
 				        | 
 				        // while e1 loop e2 pool
-				        wh = WHILE e1 = expr LOOP e2 = expr POOL {
-				            $value  =  new AST.loop($e1.value, $e2.value, $wh.getLine());
+				        whl = WHILE e1 = expr LOOP e2 = expr POOL {
+				        	cur_ln = $whl.getLine();
+				            $value  =  new AST.loop($e1.value, $e2.value, cur_ln);
 				        }
 				        | 
 				        // block expression
 				        // { e1; e2; e3; ... }
 				        lb = LBRACE bel = block_expr_list RBRACE {
-				            $value  =  new AST.block($bel.value, $lb.getLine());
+				        	cur_ln = $lb.getLine();
+				            $value  =  new AST.block($bel.value, cur_ln);
 				        }
 				        | 
 				        // let statement with declarations and expression
-				        l = LET lal = let_assgn_list IN e = expr {
-				            AST.expression current_expr  =  $e.value;
-				            int size  =  $lal.value.size();
-				            for(int i = size-1; i> = 0; i--) {
-				                AST.attr let_attr  =  $lal.value.get(i);
-				                current_expr  =  new AST.let(let_attr.name, let_attr.typeid, let_attr.value, current_expr, $l.getLine());
+				        lt = LET lal = let_assgn_list IN e = expr {
+				            int size  =  $lal.value.size() - 1;
+				            AST.expression this_expr  =  $e.value;
+				            while(size>=0) {
+				                AST.attr let_attr  =  $lal.value.get(size);
+				                cur_ln = $lt.getLine();
+				                this_expr  =  new AST.let(let_attr.name, let_attr.typeid, let_attr.value, this_expr, cur_ln);
 				            }
-				            $value  =  current_expr;
+				            $value  =  this_expr;
+				            size = size - 1;
 				        }
 				        | 
 				        // case e of bl esac
-				        c = CASE e = expr OF bl = branch_list ESAC {
-				            $value  =  new AST.typcase($e.value, $bl.value, $c.getLine());
+				        c = CASE ex = expr OF bl = branch_list ESAC {
+				        	cur_ln = $c.getLine();
+				            $value  =  new AST.typcase($ex.value, $bl.value, cur_ln);
 				        }
 				        | 
 				        // new t
 				        nw = NEW t = TYPEID {
-				            $value  =  new AST.new_($t.getText(), $nw.getLine());
+				        	cur_ln = $nw.getLine();
+				            $value  =  new AST.new_($t.getText(), cur_ln);
 				        }
 				        | 
 				        // ~ e
-				        tl = TILDE e = expr {
-				            $value  =  new AST.comp($e.value, $tl.getLine());
+				        tlde = TILDE e = expr {
+				        	cur_ln = $tlde.getLine();
+				            $value  =  new AST.comp($e.value, cur_ln);
 				        }
 				        | 
 				        // isvoid expression
-				        iv = ISVOID e1 = expr {
-				            $value  =  new AST.isvoid($e1.value, $iv.getLine());
+				        isv = ISVOID e1 = expr {
+				        	cur_ln = $isv.getLine();
+				            $value  =  new AST.isvoid($e1.value, cur_ln);
 				        }
 				        | 
 				        // multiplication
-				        e1 = expr STAR e2 = expr {
-				            $value  =  new AST.mul($e1.value, $e2.value, $e1.value.lineNo);
+				        emul = expr STAR exp = expr {
+				            $value  =  new AST.mul($emul.value, $exp.value, $emul.value.lineNo);
 				        }
 				        | 
 				        // division
-				        e1 = expr SLASH e2 = expr {
-				            $value  =  new AST.divide($e1.value, $e2.value, $e1.value.lineNo);
+				        ediv = expr SLASH exp = expr {
+				            $value  =  new AST.divide($ediv.value, $exp.value, $ediv.value.lineNo);
 				        }
 				        | 
 				        // addition
-				        e1 = expr PLUS e2 = expr {
-				            $value  =  new AST.plus($e1.value, $e2.value, $e1.value.lineNo);
+				        eadd = expr PLUS exp = expr {
+				            $value  =  new AST.plus($eadd.value, $exp.value, $eadd.value.lineNo);
 				        }
 				        | 
 				        // e1 - e2
-				        e1 = expr MINUS e2 = expr {
-				            $value  =  new AST.sub($e1.value, $e2.value, $e1.value.lineNo);
+				        esub = expr MINUS exp = expr {
+				            $value  =  new AST.sub($esub.value, $exp.value, $esub.value.lineNo);
 				        }
 				        | 
 				        // e1 < e2
-				        e1 = expr LT e2 = expr {
-				            $value  =  new AST.lt($e1.value, $e2.value, $e1.value.lineNo);
+				        elt = expr LT exp = expr {
+				            $value  =  new AST.lt($elt.value, $exp.value, $elt.value.lineNo);
 				        }
 				        | 
 				        // e1 < =  e2
-				        e1 = expr LE e2 = expr {
-				            $value  =  new AST.leq($e1.value, $e2.value, $e1.value.lineNo);
+				        ele = expr LE exp = expr {
+				            $value  =  new AST.leq($ele.value, $exp.value, $ele.value.lineNo);
 				        }
 				        | 
 				        // e1  =  e2
-				        e1 = expr EQUALS e2 = expr {
-				            $value  =  new AST.eq($e1.value, $e2.value, $e1.value.lineNo);
+				        ee = expr EQUALS exp = expr {
+				            $value  =  new AST.eq($ee.value, $exp.value, $ee.value.lineNo);
 				        }
 				        | 
 				        // not expr
-				        nt = NOT e1 = expr {
-				            $value  =  new AST.neg($e1.value, $nt.getLine());
+				        ent = NOT exp = expr {
+				            $value  =  new AST.neg($exp.value, $ent.getLine());
 				        }
 				        | 
 				        // o <- e
-				        <assoc = right>o = OBJECTID ASSIGN e = expr {
-				            $value  =  new AST.assign($o.getText(), $e.value, $o.getLine());
+				        <assoc = right> obj_id = OBJECTID ASSIGN e = expr {
+				            $value  =  new AST.assign($obj_id.getText(), $e.value, $obj_id.getLine());
 				        }
 				        | 
 				        // (e)
-				        LPAREN e = expr RPAREN {
-				            $value  =  $e.value;
+				        LPAREN exp = expr RPAREN {
+				            $value  =  $exp.value;
 				        }
 				        | 
 				        // object
-				        o = OBJECTID {
-				            $value  =  new AST.object($o.getText(), $o.getLine());
+				        ob = OBJECTID {
+				            $value  =  new AST.object($ob.getText(), $ob.getLine());
 				        }
 				        | 
 				        // integer constant
-				        i = INT_CONST {
-				            $value  =  new AST.int_const(Integer.parseInt($i.getText()), $i.getLine());
+				        iConst = INT_CONST {
+				            $value  =  new AST.int_const(Integer.parseInt($iConst.getText()), $iConst.getLine());
 				        }
 				        | 
 				        // string constant
-				        s = STR_CONST {
-				            $value  =  new AST.string_const($s.getText(), $s.getLine());
+				        sConst = STR_CONST {
+				            $value  =  new AST.string_const($sConst.getText(), $sConst.getLine());
 				        }
 				        | 
 				        // bool constant
-				        b = BOOL_CONST {
-				            $value  =  new AST.bool_const("true".equalsIgnoreCase($b.getText()), $b.getLine());
+				        bConst = BOOL_CONST {
+				            $value  =  new AST.bool_const("true".equalsIgnoreCase($bConst.getText()), $bConst.getLine());
 				        };
 // end of code
