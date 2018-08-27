@@ -1,5 +1,5 @@
 # Parser (phase B)
->Irfan Ali - cs16btech11019 , Sudhanshu Chawhan - cs16btech11037
+>Sudhanshu Chawhan - cs16btech11037 , Irfan Ali - cs16btech11019 
 ## Introduction
 A parser for COOL. 
 The assignment makes use of the parser
