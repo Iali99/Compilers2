@@ -15,7 +15,7 @@ This program also contains a class with no features
 *)
 class A inherits IO {
   foo() : Bool {
-    out_string("Hey there!\n");
+    out_string("Hey there!\n")
   };
 };
 
