@@ -1,6 +1,7 @@
 package cool;
 
 public class Visitor{
+
 	public void visitorProgram(AST.program p){
 		List<AST.class_> classes = p.classes;
 		
@@ -13,14 +14,14 @@ public class Visitor{
 				GlobalData.GiveError("class redefined : " + iter.name, iter.lineNo);
 			}
 			else
-				GlobalData.classTable.put(iter.name, "Object");
+				GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
 		}
 
 		// iterate over each class and check for cycles
 		for(AST.class_ iter : classes){
 			String parent = iter.parent;
 			
-			if(parent == Object){
+			if(parent.equals(GlobalData.Const.ROOT_TYPE)){
 				continue;
 			}
 			// check existence of parent
@@ -30,8 +31,9 @@ public class Visitor{
 			else{
 				// check for loops
 				String grandparent = GlobalData.classTable.get(parent);
-				while(grandparent != Object){
-					if(grandparent == iter.name){
+				while(grandparent.equals(GlobalData.Const.ROOT_TYPE)){
+					// check for cycles
+					if(grandparent.equals(iter.name)){
 						GlobalData.GiveError("cycles detected", iter.lineNo);
 						return;
 					}
@@ -39,9 +41,6 @@ public class Visitor{
 				}
 				GlobalData.classTable.put(iter.name, parent);
 			}
-
 		}
-
-
 	}
 }
