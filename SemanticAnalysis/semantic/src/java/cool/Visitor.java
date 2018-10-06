@@ -2,9 +2,9 @@ package cool;
 
 public class Visitor{
 
-	public void visitorProgram(AST.program p){
+	public void visitProgram(AST.program p){
 		List<AST.class_> classes = p.classes;
-		
+
 		// init classTable
 		GlobalData.classTable = new HashMap<String, String>;
 
@@ -20,7 +20,7 @@ public class Visitor{
 		// iterate over each class and check for cycles
 		for(AST.class_ iter : classes){
 			String parent = iter.parent;
-			
+
 			if(parent.equals(GlobalData.Const.ROOT_TYPE)){
 				continue;
 			}
@@ -31,7 +31,7 @@ public class Visitor{
 			else{
 				// check for loops
 				String grandparent = GlobalData.classTable.get(parent);
-				while(grandparent.equals(GlobalData.Const.ROOT_TYPE)){
+				while(!grandparent.equals(GlobalData.Const.ROOT_TYPE)){
 					// check for cycles
 					if(grandparent.equals(iter.name)){
 						GlobalData.GiveError("cycles detected", iter.lineNo);
