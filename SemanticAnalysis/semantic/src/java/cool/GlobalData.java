@@ -1,5 +1,5 @@
 package cool;
-
+import java.util.*;
 public class GlobalData{
 
 	// Type constants
@@ -14,10 +14,10 @@ public class GlobalData{
 
 	// ClassTable - maps class name to class parent
 	public static HashMap<String, String> classTable;
+  public static InheritanceGraph inheritanceGraph;
 
 	// gives error message to the user
-	public void GiveError(String error,int lineNo){
-		System.out.Println("Error: " + Integer.toString(lineNo) + " " + error);
+	public static void GiveError(String error,int lineNo){
+		System.out.println("Error: " + Integer.toString(lineNo) + " " + error);
 	}
 }
-

@@ -1,12 +1,13 @@
 package cool;
-
+import java.util.*;
 public class Visitor{
 
 	public void visitProgram(AST.program p){
 		List<AST.class_> classes = p.classes;
 
 		// init classTable
-		GlobalData.classTable = new HashMap<String, String>;
+		GlobalData.classTable = new HashMap<String, String>();
+		GlobalData.inheritanceGraph = new InheritanceGraph(p);
 
 		// go to each class and add it to classTable
 		for(AST.class_ iter : classes){
@@ -28,7 +29,7 @@ public class Visitor{
 			if(!GlobalData.classTable.containsKey(parent)){
 				GlobalData.GiveError("class does not exist : " + parent, iter.lineNo);
 			}
-			else{
+			 else{
 				// check for loops
 				String grandparent = GlobalData.classTable.get(parent);
 				while(!grandparent.equals(GlobalData.Const.ROOT_TYPE)){
@@ -42,5 +43,7 @@ public class Visitor{
 				GlobalData.classTable.put(iter.name, parent);
 			}
 		}
+		GlobalData.inheritanceGraph.setChildren();
+		GlobalData.inheritanceGraph.printGraph();
 	}
 }

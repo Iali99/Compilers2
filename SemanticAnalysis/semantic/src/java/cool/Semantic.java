@@ -15,5 +15,7 @@ public class Semantic{
 */
 	public Semantic(AST.program program){
 		//Write Semantic analyzer code here
+		Visitor v = new Visitor();
+		v.visitProgram(program);
 	}
 }

@@ -1,5 +1,5 @@
 package cool;
-import java.util.List;
+import java.util.*;
 public class AST{
 	public static class ASTNode {
 		int lineNo;
@@ -423,10 +423,10 @@ public class AST{
 			parent = p;
 			features = fs;
 			lineNo = l;
-			children = new List<String>();
+			children = new ArrayList<String>();
 		}
 
-		public AddChild(String name){
+		public void AddChild(String name){
 			children.add(name);
 		}
 		String getString(String space){
