@@ -11,6 +11,10 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     for(AST.class_ iter : p.classes){
       insert(iter);
     }
+    GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
     checkGraph();
 		setChildren();
   }
@@ -64,8 +68,9 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     //iterates over the classes of the class table.
     Iterator it = GlobalData.classTable.entrySet().iterator();
     while(it.hasNext()){
+      if(GlobalData.Const.is_standard()) continue;
       HashMap.Entry pair = (HashMap.Entry)it.next();
-      if(pair.getValue() != "Object"){
+      if(!pair.getValue().equals(GlobalData.Const.ROOT_TYPE)){
         //parentClass gets the parent class from the inheritance graph.
         AST.class_ parentClass = graph.get(pair.getValue());
         //The current iterating class is added as child to its parent class.
@@ -73,7 +78,6 @@ public class InheritanceGraph implements InheritanceGraphInterface{
         //Parent class is updated in the inheritance graph.
         graph.put((String)pair.getValue(),parentClass);
       }
-      it.remove();
     }
   }
 
