@@ -2,7 +2,7 @@ package cool;
 import java.util.*;
 public class InheritanceGraph implements InheritanceGraphInterface{
 
-  public HashMap<String, AST.class_> graph = new HashMap<String, AST.class_>();
+  private HashMap<String, AST.class_> graph = new HashMap<String, AST.class_>();
   private AST.program p;
 
   //constructor to create inheritance graph.
@@ -113,11 +113,17 @@ public class InheritanceGraph implements InheritanceGraphInterface{
       System.out.println(" ------ Next ------");
     }
   }
-  
+
   protected void printList(List<String> l)
   {
     for(int i = 0; i < l.size(); i++) {
             System.out.println(l.get(i));
         }
+  }
+
+  //function to check if a class exists in the inheritance graph.
+  public boolean containsClass(String classname)
+  {
+    return graph.containsKey(classname);
   }
 }
