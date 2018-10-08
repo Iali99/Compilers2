@@ -18,6 +18,6 @@ public class GlobalData{
 
 	// gives error message to the user
 	public static void GiveError(String error,int lineNo){
-		System.out.println("Error: " + Integer.toString(lineNo) + " " + error);
+		System.out.println("Error: at line no. " + Integer.toString(lineNo) + " : " + error);
 	}
 }

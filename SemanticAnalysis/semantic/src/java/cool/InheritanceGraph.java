@@ -3,12 +3,55 @@ import java.util.*;
 public class InheritanceGraph implements InheritanceGraphInterface{
 
   public HashMap<String, AST.class_> graph = new HashMap<String, AST.class_>();
+  private AST.program p;
 
   //constructor to create inheritance graph.
-  public InheritanceGraph(AST.program p){
+  public InheritanceGraph(AST.program pr){
+    p = pr;
     for(AST.class_ iter : p.classes){
       insert(iter);
     }
+    checkGraph();
+		setChildren();
+  }
+
+  public void checkGraph(){
+    List<AST.class_> classes = p.classes;
+
+		// go to each class and add it to classTable
+		for(AST.class_ iter : classes){
+			if(GlobalData.classTable.containsKey(iter.name)){
+				GlobalData.GiveError("class redefined : " + iter.name, iter.lineNo);
+			}
+			else
+				GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
+		}
+
+		// iterate over each class and check for cycles
+		for(AST.class_ iter : classes){
+			String parent = iter.parent;
+
+			if(parent.equals(GlobalData.Const.ROOT_TYPE)){
+				continue;
+			}
+			// check existence of parent
+			if(!GlobalData.classTable.containsKey(parent)){
+				GlobalData.GiveError("class does not exist : " + parent, iter.lineNo);
+			}
+			 else{
+				// check for loops
+				String grandparent = GlobalData.classTable.get(parent);
+				while(!grandparent.equals(GlobalData.Const.ROOT_TYPE)){
+					// check for cycles
+					if(grandparent.equals(iter.name)){
+						GlobalData.GiveError("cycle detected", iter.lineNo);
+						System.exit(1);
+					}
+					grandparent = GlobalData.classTable.get(grandparent);
+				}
+				GlobalData.classTable.put(iter.name, parent);
+			}
+		}
   }
 
   //insert a class in the inheritance graph.
@@ -47,7 +90,8 @@ public class InheritanceGraph implements InheritanceGraphInterface{
       System.out.println(" ------ Next ------");
     }
   }
-  void printList(List<String> l)
+  
+  protected void printList(List<String> l)
   {
     for(int i = 0; i < l.size(); i++) {
             System.out.println(l.get(i));
