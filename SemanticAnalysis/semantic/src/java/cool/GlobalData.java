@@ -10,13 +10,13 @@ public class GlobalData{
         public static final String BOOL_TYPE = "Bool";
         public static final String STRING_TYPE = "String";
         public static final String MAIN_TYPE = "Main";
-        // public static final bool is_standard(String name){
-        //     if(name.equals(IO_TYPE)) return true;
-        //     if(name.equals(STRING_TYPE)) return true;
-        //     if(name.equals(BOOL_TYPE)) return true;
-        //     if(name.equals(INT_TYPE)) return true;
-        //     return false;
-        // }
+        public static final bool is_standard(String name){
+            if(name.equals(IO_TYPE)) return true;
+            if(name.equals(STRING_TYPE)) return true;
+            if(name.equals(BOOL_TYPE)) return true;
+            if(name.equals(INT_TYPE)) return true;
+            return false;
+        }
     }
 
     // ROOT class Object
