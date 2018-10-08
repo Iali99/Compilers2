@@ -16,10 +16,10 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     for(AST.class_ iter : p.classes){
       insert(iter);
     }
-    GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
-    GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
-    GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
-    GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
+    // GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
+    // GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
+    // GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
+    // GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
     checkGraph();
 		setChildren();
   }
@@ -120,9 +120,9 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     String parent = GlobalData.classTable.get(cl);
     while(!parent.equals(GlobalData.Const.ROOT_TYPE)){
       if(parent.equals(super_cl)) return true;
+      parent = GlobalData.classTable.get(parent);
     }
     return false;
-
   }
 
   public void printGraph()

@@ -19,12 +19,22 @@ public class GlobalData{
         }
     }
 
+  public static AST.class_ ROOT_CLASS = new AST.class_(Const.ROOT_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
+  public static AST.class_ IO_CLASS   = new AST.class_(Const.IO_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
+  public static AST.class_ INT_CLASS = new AST.class_(Const.INT_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
+  public static AST.class_ BOOL_CLASS = new AST.class_(Const.BOOL_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
+  public static AST.class_ STRING_CLASS = new AST.class_(Const.STRING_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
+    
+
   // ClassTable - maps class name to class parent
+  public static HashMap<String, String> classTable;
+  // variable name -> variable return type
   public static ScopeTable<String> attrScopeTable;
   // function name -> FunctionTypeMangledName
   public static ScopeTable<String> methodScopeTable;
-  public static HashMap<String, String> classTable;
+  
   public static InheritanceGraph inheritanceGraph;
+  public static String filename;
 
   //get mangled name of a function with classname and parameters
   public static String mangledNameWithClass(String classname, AST.method m)
