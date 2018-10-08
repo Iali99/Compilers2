@@ -8,6 +8,11 @@ public class InheritanceGraph implements InheritanceGraphInterface{
   //constructor to create inheritance graph.
   public InheritanceGraph(AST.program pr){
     p = pr;
+    insert(GlobalData.ROOT_CLASS);
+    insert(GlobalData.IO_CLASS);
+    insert(GlobalData.BOOL_CLASS);
+    insert(GlobalData.INT_CLASS);
+    insert(GlobalData.STRING_CLASS);
     for(AST.class_ iter : p.classes){
       insert(iter);
     }
@@ -20,10 +25,18 @@ public class InheritanceGraph implements InheritanceGraphInterface{
   }
 
   public void traverseGraph(AST.class_ node){
+    // visit current node
     visit(node);
+    // enter scope
+    GlobalData.attrScopeTable.enterScope();
+    GlobalData.methodScopeTable.enterScope();
+    // recursively traverse every child
     for(String it : node.children){
       traverseGraph(graph.get(it));
     }
+    // exit scope
+    GlobalData.attrScopeTable.exitScope();
+    GlobalData.methodScopeTable.exitScope();
   }
 
   public void checkGraph(){
@@ -75,7 +88,6 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     //iterates over the classes of the class table.
     Iterator it = GlobalData.classTable.entrySet().iterator();
     while(it.hasNext()){
-      if(GlobalData.Const.is_standard()) continue;
       HashMap.Entry pair = (HashMap.Entry)it.next();
       if(!pair.getValue().equals(GlobalData.Const.ROOT_TYPE)){
         //parentClass gets the parent class from the inheritance graph.
