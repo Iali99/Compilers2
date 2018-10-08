@@ -53,10 +53,182 @@ public class Visitor{
 		if("self".equals(a.name)){
 			// error self keyword cant be used
 		} else if(!GlobalData.inheritanceGraph.con(a.typeid)){
-			// error 
+			// error
 		}
 		if(GlobalData.inheritanceGraph(a.typeid))
-		
 
+
+	}
+
+	public void visit(AST.no_expr e){
+		e.type = "_no_type";
+	}
+
+	public void visit(AST.bool_const e){
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.string_const e){
+		e.type = GlobalData.Const.STRING_TYPE;
+	}
+
+	public void visit(AST.int_const e){
+		e.type = GlobalData.Const.INT_TYPE;
+	}
+
+	public void visit(AST.comp e){
+		visit(e.e1);
+		if(!(e.e1.type).equals(GlobalData.Const.BOOL_TYPE)){
+			//error : NOT a boolean type expression
+		}
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.eq e){
+		visit(e.e1);
+		visit(e.e2);
+		if(!e.e1.type.equals(e.e2.type)){
+			//error : The types of expressions to be checked are not same.
+		}
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.leq e){
+		visit(e.e1);
+		visit(e.e2);
+		if(!e.e1.type.equals(GlobalData.Const.INT_TYPE) || !e.e2.type.equals(GlobalData.Const.INT_TYPE)){
+			//error : NON INT types. Operation cannot be done.
+		}
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.lt e){
+		visit(e.e1);
+		visit(e.e2);
+		if(!e.e1.type.equals(GlobalData.Const.INT_TYPE) || !e.e2.type.equals(GlobalData.Const.INT_TYPE)){
+			//error : NON INT types. Operation cannot be done.
+		}
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.divide e){
+		visit(e.e1);
+		visit(e.e2);
+		if(!e.e1.type.equals(GlobalData.Const.INT_TYPE) || !e.e2.type.equals(GlobalData.Const.INT_TYPE)){
+			//error : NON INT types. Operation cannot be done.
+		}
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.mul e){
+		visit(e.e1);
+		visit(e.e2);
+		if(!e.e1.type.equals(GlobalData.Const.INT_TYPE) || !e.e2.type.equals(GlobalData.Const.INT_TYPE)){
+			//error : NON INT types. Operation cannot be done.
+		}
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.sub e){
+		visit(e.e1);
+		visit(e.e2);
+		if(!e.e1.type.equals(GlobalData.Const.INT_TYPE) || !e.e2.type.equals(GlobalData.Const.INT_TYPE)){
+			//error : NON INT types. Operation cannot be done.
+		}
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.plus e){
+		visit(e.e1);
+		visit(e.e2);
+		if(!e.e1.type.equals(GlobalData.Const.INT_TYPE) || !e.e2.type.equals(GlobalData.Const.INT_TYPE)){
+			//error : NON INT types. Operation cannot be done.
+		}
+		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.isvoid e){
+		visit(e.e1);
+		e.e1.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.new_ e){
+		if(!GlobalData.inheritanceGraph.containsClass(e.typeid)){
+			//error : Type not defined.
+			e.type = GlobalData.Const.ROOT_TYPE;
+		}
+		else{
+			e.type = e.typeid;
+		}
+	}
+
+	public void visit(AST.assign e){
+		visit(e.e1);
+		if(!(GlobalData.attrScopeTable.lookUpGlobal(e.name)).equals(e.e1.type)){
+			if(GlobalData.attrScopeTable.lookUpGlobal(e.name) == null){
+				//error : attr not declared.
+			}
+			else{
+				//error : Types do not match for assignment
+			}
+		}
+		e.type = e.e1.type;
+	}
+
+	public void visit(AST.block e){
+		for(AST.expression e1 : e.l1){
+			visit(e1);
+		}
+		e.type = e.l1.get(e.l1.size()-1).type;
+	}
+
+	public void vist(AST.loop e){
+		visit(e.predicate);
+		visit(e.body);
+		if(!e.predicate.type.equals(GlobalData.Const.BOOL_TYPE)){
+			//error: Predicate is not of type bool.
+		}
+		e.type = GlobalData.Const.ROOT_TYPE;
+	}
+
+	public void visit(AST.cond e){
+		visit(e.predicate);
+		visit(e.ifbody);
+		visit(e.elsebody);
+		if(!e.predicate.type.equals(GlobalData.Const.BOOL_TYPE)){
+			//error: Predicate is not of type bool.
+		}
+		if(e.ifbody.type.equals(e.elsebody.type)){
+			e.type = e.ifbody.type;
+		}
+		else{
+			e.type = GlobalData.Const.ROOT_TYPE;
+		}
+	}
+
+	public void visit(AST.let e){
+		visit(e.value);
+		visit(e.body);
+		GlobalData.attrScopeTable.enterScope();
+		if(!GlobalData.inheritanceGraph.containsClass(e.typeid)){
+			//error : Type not defined.
+			GlobalData.attrScopeTable.insert(e.name,GlobalData.Const.BOOL_TYPE);
+		}
+		else{
+			GlobalData.attrScopeTable.insert(e.name,e.typeid);
+		}
+		if(!(e.value instanceof AST.no_expr)){
+			if(!GlobalData.inheritanceGraph.isConforming(e.typeid,e.value.type)){
+				//error : types not conforming for assignment.
+			}
+		}
+		e.type = e.body.type;
+		GlobalData.attrScopeTable.exitScope();
+	}
+
+	private boolean isStdType(AST.expression e){
+		if(e.type.equals(GlobalData.Const.INT_TYPE) || e.type.equals(GlobalData.Const.BOOL_TYPE) || e.type.equals(GlobalData.Const.STRING_TYPE) )
+			return true;
+		return false;
 	}
 }
