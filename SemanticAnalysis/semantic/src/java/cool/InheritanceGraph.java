@@ -19,6 +19,13 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 		setChildren();
   }
 
+  public void traverseGraph(AST.class_ node){
+    visit(node);
+    for(String it : node.children){
+      traverseGraph(graph.get(it));
+    }
+  }
+
   public void checkGraph(){
     List<AST.class_> classes = p.classes;
 
