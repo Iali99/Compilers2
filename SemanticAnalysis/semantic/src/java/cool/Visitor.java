@@ -363,6 +363,7 @@ public class Visitor{
 		}
 		if(class == null){
 			//error : method not defined.
+			Semantic.reportError(GlobalData.filename, e.lineNo, "method not defined : "+e.name);
 			e.type = GlobalData.Const.ROOT_TYPE;
 		}
 		else{
@@ -378,11 +379,13 @@ public class Visitor{
 		Stirng class = e.caller.type;
 		if(!GlobalData.inheritanceGraph.containsClass(e.typeid)){
 			//error : Type not defined.
+			Semantic.reportError(GlobalData.filename, e.lineNo, "type not defined : "+e.typeid);
 			e.typeid = GlobalData.Const.ROOT_TYPE;
 			e.type = GlobalData.Const.ROOT_TYPE;
 		}
 		else if(!GlobalData.inheritanceGraph.isConforming(e.typeid,class)){
 			//error: types not conforming.
+			Semantic.reportError(GlobalData.filename, e.lineNo, "types not conforming : "+e.typeid);
 			e.type = GlobalData.Const.ROOT_TYPE;
 		}
 		else{
@@ -390,6 +393,7 @@ public class Visitor{
 			String type = GlobalData.methodReturnTable.get(mangledName);
 			if(type == null){
 				//error : method not defined.
+				Semantic.reportError(GlobalData.filename, e.lineNo, "method not defined : "+e.name);
 				e.type = GlobalData.Const.ROOT_TYPE;
 			}
 			else{
@@ -413,10 +417,12 @@ public class Visitor{
 
 		if("self".equals(e.name)){
 			//error : name cannot be self.
+			Semantic.reportError(GlobalData.filename, e.lineNo, "name cannot be self : "+e.name);
 		}
 		else{
 			if(!GlobalData.inheritanceGraph.containsClass(e.type)){
 				//error : Type does not exist.
+				Semantic.reportError(GlobalData.filename, e.lineNo, "types does not exist : "+e.typeid);
 				e.type = GlobalData.Const.ROOT_TYPE;
 			}
 			GlobalData.attrScopeTable.insert(e.name,e.type);
