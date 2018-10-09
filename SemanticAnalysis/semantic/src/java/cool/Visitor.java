@@ -71,13 +71,16 @@ public class Visitor{
 				// error redefined globally
 				Semantic.reportError(GlobalData.filename, a.lineNo, "redefined attribute exists globally : "+attr.name);
 			}
+			return;
 		}
 		if("self".equals(a.name)){
 			// error self keyword cant be used
+			Semantic.reportError(GlobalData.filename, a.lineNo, "name can not be self");
 		}else if(!GlobalData.inheritanceGraph.containsClass(a.typeid)){
 			// error typeid does not exits
 			Semantic.reportError(GlobalData.filename, a.lineNo, "return type does not exist : "+a.typeid);
 			// todo recover
+			a.typeid = GlobalData.Const.ROOT_TYPE;
 		}else{
 			// attribute is valid
 			visit(a.value);
@@ -132,7 +135,6 @@ public class Visitor{
 			}else if(flist.contains(fl.name)){
 				// error formal redefined
 				Semantic.reportError(GlobalData.filename, fl.lineNo, "formal can not be redefined : "+fl.name);				
-
 			}else{
 				flist.add(fl.name);
 			}
@@ -155,9 +157,11 @@ public class Visitor{
 
 	public void visit(AST.formal f){
 		// check for undefined type
-		if(GlobalData.inheritanceGraph.containsClass(f.typeid)){
+		if(!GlobalData.inheritanceGraph.containsClass(f.typeid)){
 			// error undefined type
-			Semantic.reportError(GlobalData.filename, f.lineNo, "type not defined : "+f.typeid);				
+			Semantic.reportError(GlobalData.filename, f.lineNo, "type not defined : "+f.typeid);
+			// recover
+			f.typeid = GlobalData.Const.ROOT_TYPE;				
 		}
 		else{
 			GlobalData.attrScopeTable.insert(f.name, f.typeid);
