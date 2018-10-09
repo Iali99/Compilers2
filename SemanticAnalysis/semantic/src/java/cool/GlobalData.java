@@ -24,7 +24,7 @@ public class GlobalData{
   public static AST.class_ INT_CLASS = new AST.class_(Const.INT_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
   public static AST.class_ BOOL_CLASS = new AST.class_(Const.BOOL_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
   public static AST.class_ STRING_CLASS = new AST.class_(Const.STRING_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
-    
+
 
   // ClassTable - maps class name to class parent
   public static HashMap<String, String> classTable;
@@ -32,7 +32,7 @@ public class GlobalData{
   public static ScopeTable<String> attrScopeTable;
   // function name -> FunctionTypeMangledName
   public static ScopeTable<String> methodScopeTable;
-  
+
   public static InheritanceGraph inheritanceGraph;
   public static String filename;
 
@@ -68,6 +68,30 @@ public class GlobalData{
       }
     }
     return mangledName.toString();
+  }
+
+  public static String mangledNameWithExpr(String class,String name,List<AST.expression> elist)
+  {
+    StringBuilder mangledName = new StringBuilder();
+    mangledName.append(class).append("$");
+    mangledName.append(name).append("$");
+    mangledName.append("_NP").append(elist.size()).append("$");
+    if(elist.size() != 0)
+    {
+      for(AST.expression e : elist)
+      {
+        mangledName.append(e.type).append("$");
+      }
+    }
+    return mangledName.toString();
+  }
+
+  //to check if a method has arguments.
+  public boolean hasArguments(String name)
+  {
+    if(name.contains("_NP0"))
+      return false;
+    return true;
   }
   // gives error message to the user
   public static void GiveError(String error,int lineNo){

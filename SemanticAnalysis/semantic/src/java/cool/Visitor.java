@@ -293,6 +293,86 @@ public class Visitor{
 		GlobalData.attrScopeTable.exitScope();
 	}
 
+	public void visit(AST.dispatch e){
+		visit(e.caller);
+		for(AST.expression e1 : e.actuals){
+			visit(e1);
+		}
+		String class = e.caller.type;
+		String mangledName = GlobalData.mangledNameWithExpr(class,e.name,e.actuals);
+		String type = GlobalData.methodReturnTable.get(mangledName);
+
+		while(class != null){
+			class = GlobalData.classTable.get(class)
+			mangledName = GlobalData.mangledNameWithExpr(class,e.name,e.actuals);
+			type = GlobalData.methodReturnTable.get(mangledName);
+			if(type != null)
+				break;
+		}
+		if(class == null){
+			//error : method not defined.
+			e.type = GlobalData.Const.ROOT_TYPE;
+		}
+		else{
+			e.type = type;
+		}
+	}
+
+	public void visit(AST.static_dispatch e){
+		visit(e.caller);
+		for(AST.expression e1: e.actuals){
+			visit(e1);
+		}
+		Stirng class = e.caller.type;
+		if(!GlobalData.inheritanceGraph.containsClass(e.typeid)){
+			//error : Type not defined.
+			e.typeid = GlobalData.Const.ROOT_TYPE;
+			e.type = GlobalData.Const.ROOT_TYPE;
+		}
+		else if(!GlobalData.inheritanceGraph.isConforming(e.typeid,class)){
+			//error: types not conforming.
+			e.type = GlobalData.Const.ROOT_TYPE;
+		}
+		else{
+			String mangledName = GlobalData.mangledNameWithExpr(class,e.name,e.actuals);
+			String type = GlobalData.methodReturnTable.get(mangledName);
+			if(type == null){
+				//error : method not defined.
+				e.type = GlobalData.Const.ROOT_TYPE;
+			}
+			else{
+				e.type = type;
+			}
+		}
+	}
+
+	public void visit(AST.typcase e){
+		visit(e.predicate);
+		visit(e.branches.get(0));
+		e.type = e.branches.get(0).value.type;
+		for(int i =1;i<e.branches.size();i++){
+			visit(e.branches.get(i));
+			e.type = GlobalData.inheritanceGraph.getSuperClass(e.type,e.branches.get(i));
+		}
+	}
+
+	public void visit(AST.branch e){
+		GlobalData.attrScopeTable.enterScope();
+
+		if("self".equals(e.name)){
+			//error : name cannot be self.
+		}
+		else{
+			if(!GlobalData.inheritanceGraph.containsClass(e.type)){
+				//error : Type does not exist.
+				e.type = GlobalData.Const.ROOT_TYPE;
+			}
+			GlobalData.attrScopeTable.insert(e.name,e.type);
+		}
+		visit(e.value);
+		GlobalData.attrScopeTable.exitScope();
+	}
+
 	private boolean isStdType(AST.expression e){
 		if(e.type.equals(GlobalData.Const.INT_TYPE) || e.type.equals(GlobalData.Const.BOOL_TYPE) || e.type.equals(GlobalData.Const.STRING_TYPE) )
 			return true;
