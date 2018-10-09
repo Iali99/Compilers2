@@ -16,10 +16,10 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     for(AST.class_ iter : p.classes){
       insert(iter);
     }
-    GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
-    GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
-    GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
-    GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
+    // GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
+    // GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
+    // GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
+    // GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
     checkGraph();
 		setChildren();
   }
@@ -60,9 +60,14 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 			}
 			// check existence of parent
 			if(!GlobalData.classTable.containsKey(parent)){
-				GlobalData.GiveError("class does not exist : " + parent, iter.lineNo);
+        // if parent is standard
+        if(GlobalData.Const.is_standard(parent)){
+          // error standard class as parent
+          GlobalData.GiveError("standard class can't be inherited : " + parent, iter.lineNo);
+        }
+				else GlobalData.GiveError("class does not exist : " + parent, iter.lineNo);
 			}
-			 else{
+			else{
 				// check for loops
 				String grandparent = GlobalData.classTable.get(parent);
 				while(!grandparent.equals(GlobalData.Const.ROOT_TYPE)){
@@ -78,6 +83,12 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 		}
   }
 
+  //function to check if a class exists in the inheritance graph.
+  public boolean containsClass(String classname)
+  {
+    return graph.containsKey(classname);
+  }
+  
   //insert a class in the inheritance graph.
   public void insert(AST.class_ c){
      graph.put(c.name,c);
@@ -98,6 +109,20 @@ public class InheritanceGraph implements InheritanceGraphInterface{
         graph.put((String)pair.getValue(),parentClass);
       }
     }
+  }
+
+  // checks if cl can be returned for super_cl
+  public boolean isConforming(String super_cl, String cl){
+    // if super_cl and cl are same or super_cl is root type
+    if(cl.equals(super_cl) || super.equals(GlobalData.Const.ROOT_TYPE)) return true;
+    // if super_cl or cl is standard type
+    if(GlobalData.Const.is_standard(super_cl) || GlobalData.Const.is_standard(cl)) return false;
+    String parent = GlobalData.classTable.get(cl);
+    while(!parent.equals(GlobalData.Const.ROOT_TYPE)){
+      if(parent.equals(super_cl)) return true;
+      parent = GlobalData.classTable.get(parent);
+    }
+    return false;
   }
 
   public void printGraph()
@@ -121,9 +146,4 @@ public class InheritanceGraph implements InheritanceGraphInterface{
         }
   }
 
-  //function to check if a class exists in the inheritance graph.
-  public boolean containsClass(String classname)
-  {
-    return graph.containsKey(classname);
-  }
 }
