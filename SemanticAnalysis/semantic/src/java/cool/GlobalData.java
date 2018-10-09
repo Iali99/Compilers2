@@ -32,6 +32,11 @@ public class GlobalData{
   public static ScopeTable<String> attrScopeTable;
   // function name -> FunctionTypeMangledName
   public static ScopeTable<String> methodScopeTable;
+<<<<<<< HEAD
+=======
+  // functionClassMangledName -> function return type
+  public static HashMap<String, String> methodReturnTable;
+>>>>>>> 10131f33999cc76ab1421e65a0858016f8b2c7b1
 
   public static InheritanceGraph inheritanceGraph;
   public static String filename;

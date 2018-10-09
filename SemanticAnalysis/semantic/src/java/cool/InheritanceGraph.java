@@ -24,6 +24,14 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 		setChildren();
   }
 
+  public List<AST.class_> getClassList(){
+    List<AST.class_> cl_list = new List<AST.class_>();
+    for(String it : GlobalData.classTable){
+      cl_list.add(graph.get(it));
+    } 
+    return cl_list;
+  }
+
   public void traverseGraph(AST.class_ node){
     // visit current node
     visit(node);
@@ -45,7 +53,7 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 		// go to each class and add it to classTable
 		for(AST.class_ iter : classes){
 			if(GlobalData.classTable.containsKey(iter.name)){
-				GlobalData.GiveError("class redefined : " + iter.name, iter.lineNo);
+				Semantic.reportError(GlobalData.filename, iter.lineNo, "class redefined : " + iter.name);
 			}
 			else
 				GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
@@ -63,17 +71,20 @@ public class InheritanceGraph implements InheritanceGraphInterface{
         // if parent is standard
         if(GlobalData.Const.is_standard(parent)){
           // error standard class as parent
-          GlobalData.GiveError("standard class can't be inherited : " + parent, iter.lineNo);
+          Semantic.reportError(GlobalData.filename, iter.lineNo, "standard class can't be inherited : " + parent);
         }
-				else GlobalData.GiveError("class does not exist : " + parent, iter.lineNo);
-			}
+				else Semantic.reportError(GlobalData.filename, iter.lineNo, "class does not exist : " + parent);
+        // recover
+        iter.parent = GlobalData.ROOT_CLASS;
+        GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
+      }
 			else{
 				// check for loops
 				String grandparent = GlobalData.classTable.get(parent);
 				while(!grandparent.equals(GlobalData.Const.ROOT_TYPE)){
 					// check for cycles
 					if(grandparent.equals(iter.name)){
-						GlobalData.GiveError("cycle detected", iter.lineNo);
+						Semantic.reportError(GlobalData.filename, iter.lineNo, "cycle detected : "+iter.name);
 						System.exit(1);
 					}
 					grandparent = GlobalData.classTable.get(grandparent);
@@ -109,6 +120,13 @@ public class InheritanceGraph implements InheritanceGraphInterface{
         graph.put((String)pair.getValue(),parentClass);
       }
     }
+  }
+
+  // returns super class of cl1 and cl2
+  public String getSuper(String cl1, String cl2){
+    if(isConforming(cl1, cl2)) return cl1;
+    else if(isConforming(cl2, cl1)) return cl2;
+    else return GlobalData.Const.ROOT_TYPE;
   }
 
   // checks if cl can be returned for super_cl

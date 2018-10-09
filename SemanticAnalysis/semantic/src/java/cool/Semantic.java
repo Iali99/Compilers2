@@ -4,7 +4,7 @@ public class Semantic{
 	private boolean errorFlag = false;
 	public void reportError(String filename, int lineNo, String error){
 		errorFlag = true;
-		System.err.println(filename+":"+lineNo+": "+error);
+		System.err.println(filename+": error at "+lineNo+": "+error);
 	}
 	public boolean getErrorFlag(){
 		return errorFlag;
