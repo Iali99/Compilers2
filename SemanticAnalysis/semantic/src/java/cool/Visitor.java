@@ -6,11 +6,25 @@ public class Visitor{
 		// init classTable
 		GlobalData.attrScopeTable = new ScopeTable();
 		GlobalData.methodScopeTable = new ScopeTable();
+		GlobalData.methodReturnTable = new HashMap<String, String>();
 		GlobalData.classTable = new HashMap<String, String>();
 		GlobalData.inheritanceGraph = new InheritanceGraph(p);
 		GlobalData.inheritanceGraph.traverseGraph();
+		updateMangledNames();
 		GlobalData.inheritanceGraph.printGraph();
 	}
+
+	// For all the methods in all the classes
+    private void updateMangledNames(){
+        for(AST.class_ cl: GlobalData.inheritanceGraph.getClassList()){
+            for(AST.feature f: cl.features){
+                if(f instanceof AST.method){
+                    AST.method m = (AST.method) f;
+                    GlobalData.methodReturnTable.put(GlobalData.mangledNameWithClass(m), m.typeid);
+                }
+            }
+        } 
+    }
 
 	public void visit(AST.class_ c){
 

@@ -24,6 +24,14 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 		setChildren();
   }
 
+  public List<AST.class_> getClassList(){
+    List<AST.class_> cl_list = new List<AST.class_>();
+    for(String it : GlobalData.classTable){
+      cl_list.add(graph.get(it));
+    } 
+    return cl_list;
+  }
+
   public void traverseGraph(AST.class_ node){
     // visit current node
     visit(node);
@@ -112,6 +120,13 @@ public class InheritanceGraph implements InheritanceGraphInterface{
         graph.put((String)pair.getValue(),parentClass);
       }
     }
+  }
+
+  // returns super class of cl1 and cl2
+  public String getSuper(String cl1, String cl2){
+    if(isConforming(cl1, cl2)) return cl1;
+    else if(isConforming(cl2, cl1)) return cl2;
+    else return GlobalData.Const.ROOT_TYPE;
   }
 
   // checks if cl can be returned for super_cl
