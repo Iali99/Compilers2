@@ -4,13 +4,14 @@ public class Visitor{
 
 	public void visit(AST.program p){
 		// init classTable
-		GlobalData.attrScopeTable = new ScopeTable();
-		GlobalData.methodScopeTable = new ScopeTable();
+		GlobalData.attrScopeTable = new ScopeTable<String>();
+		GlobalData.methodScopeTable = new ScopeTable<String>();
 		GlobalData.methodReturnTable = new HashMap<String, String>();
 		GlobalData.classTable = new HashMap<String, String>();
 		GlobalData.inheritanceGraph = new InheritanceGraph(p);
-		GlobalData.inheritanceGraph.traverseGraph();
 		updateMangledNames();
+		GlobalData.inheritanceGraph.traverseGraph(GlobalData.inheritanceGraph.getRootClass());
+
 		GlobalData.inheritanceGraph.printGraph();
 	}
 
@@ -20,21 +21,23 @@ public class Visitor{
             for(AST.feature f: cl.features){
                 if(f instanceof AST.method){
                     AST.method m = (AST.method) f;
-                    GlobalData.methodReturnTable.put(GlobalData.mangledNameWithClass(m), m.typeid);
+									//	System.out.println("Inserting into methodReturnTable : "+ GlobalData.mangledNameWithClass(cl.name ,m));
+                    GlobalData.methodReturnTable.put(GlobalData.mangledNameWithClass(cl.name ,m), m.typeid);
                 }
             }
         }
     }
 
 	public void visit(AST.class_ c){
-
-        Global.currentClass = c.name;
+        GlobalData.currentClass = c.name;
 		// visiting all its features for semantics
         for(AST.feature f: c.features){
             if(f instanceof AST.attr){ // Its an attribute
+
                 AST.attr a = (AST.attr) f;
                 visit(a);
             }else{ // Its a method
+
                 AST.method m = (AST.method) f;
                 visit(m);
             }
@@ -42,21 +45,25 @@ public class Visitor{
 		// if this is main class
 		if(c.name.equals(GlobalData.Const.MAIN_TYPE)){
 			// main class
-			String mainMethod = GlobalData.methodScopeTable.lookUpLocal(c.name);
+			String mainMethod = GlobalData.methodScopeTable.lookUpLocal("main");
 			if(mainMethod==null){
 				// error main method missing
-				Semantic.reportError(GlobalData.filename, c.lineNo, "Main method missing in class main");
-			}else if(hasArguments(mainMethod)){
+				Semantic.reportError(GlobalData.filename, c.lineNo, "main method missing in class Main");
+			}else if(GlobalData.hasArguments(mainMethod)){
 				// error main has arguments
 				Semantic.reportError(GlobalData.filename, c.lineNo, "arguments not allowed in main method");
 			}
 		}
 
 		// visitor for class
-		if(GlobalData.is_standard(AST.class_.name)){
+		if(GlobalData.Const.is_standard(c.name)){
 			return;
 		}
 	}
+
+	// public void visit(AST.expression e){
+	// 	return;
+	// }
 
 	public void visit(AST.attr a){
 		// not available globally
@@ -66,10 +73,10 @@ public class Visitor{
 			// re defined
 			if(GlobalData.attrScopeTable.lookUpLocal(a.name) != null){
 				//error redefined attribute same class
-				Semantic.reportError(GlobalData.filename, a.lineNo, "redefined attribute in same class : "+attr.name);
+				Semantic.reportError(GlobalData.filename, a.lineNo, "redefined attribute in same class : "+a.name);
 			}else{
 				// error redefined globally
-				Semantic.reportError(GlobalData.filename, a.lineNo, "redefined attribute exists globally : "+attr.name);
+				Semantic.reportError(GlobalData.filename, a.lineNo, "redefined attribute exists globally : "+a.name);
 			}
 			return;
 		}
@@ -99,13 +106,14 @@ public class Visitor{
 
 	public void visit(AST.method m){
 		// check for undefined types
-		if(!GlobalData.InheritanceGraph.containsClass(m.typeid)){
+		if(!GlobalData.inheritanceGraph.containsClass(m.typeid)){
 			// error type not defined
 			Semantic.reportError(GlobalData.filename, m.lineNo, "return type not defined : "+m.typeid);
 			// recover
 			m.typeid = GlobalData.Const.ROOT_TYPE;
 		}
 		String globalMangledName;
+		String thisTypeMangledName = GlobalData.mangledNameWithType(m);
 		// check if already defined locally
 		if(GlobalData.methodScopeTable.lookUpLocal(m.name) != null){
 			// error method redefined
@@ -114,20 +122,19 @@ public class Visitor{
 			return;
 		}
 		// check if the method exists globally
-		else if(globalMangledName = GlobalData.methodScopeTable.lookUpGlobal(m.name) && globalMangledName != null){
-			String thisTypeMangledName = mangledNameWithType(this);
+		else if((globalMangledName = GlobalData.methodScopeTable.lookUpGlobal(m.name))!=null){
 			if(!thisTypeMangledName.equals(globalMangledName)){
 				// error unmatched methods globally
 				Semantic.reportError(GlobalData.filename, m.lineNo, "method inconsistent with parent declaration : "+m.name);
 			}
-			GlobalData.methodScopeTable.insert(m.name, thisTypeMangledName);
 		}
+		GlobalData.methodScopeTable.insert(m.name, thisTypeMangledName);
 		// visit method internally
 		// enter scope
 		GlobalData.attrScopeTable.enterScope();
 
 		// loop through formal list
-		set<String> flist = new HashSet<>;
+		Set<String> flist = new HashSet<>();
 		for(AST.formal fl : m.formals){
 			if(fl.name.equals("self")){
 				// error self cant be name
@@ -168,6 +175,58 @@ public class Visitor{
 		}
 	}
 
+	public void visit(AST.expression e){
+				if(e instanceof AST.no_expr)
+					visit((AST.no_expr)e);
+				if(e instanceof AST.bool_const)
+					visit((AST.bool_const)e);
+				if(e instanceof AST.string_const)
+					visit((AST.string_const)e);
+				if(e instanceof AST.int_const)
+					visit((AST.int_const)e);
+				if(e instanceof AST.object)
+					visit((AST.object)e);
+				if(e instanceof AST.comp)
+					visit((AST.comp)e);
+				if(e instanceof AST.eq)
+					visit((AST.eq)e);
+				if(e instanceof AST.leq)
+					visit((AST.leq)e);
+				if(e instanceof AST.lt)
+					visit((AST.lt)e);
+				if(e instanceof AST.neg)
+					visit((AST.neg)e);
+				if(e instanceof AST.divide)
+					visit((AST.divide)e);
+				if(e instanceof AST.mul)
+					visit((AST.mul)e);
+				if(e instanceof AST.sub)
+					visit((AST.sub)e);
+				if(e instanceof AST.plus)
+					visit((AST.plus)e);
+				if(e instanceof AST.isvoid)
+					visit((AST.isvoid)e);
+				if(e instanceof AST.new_)
+					visit((AST.new_)e);
+				if(e instanceof AST.assign)
+					visit((AST.assign)e);
+				if(e instanceof AST.block)
+					visit((AST.block)e);
+				if(e instanceof AST.loop)
+					visit((AST.loop)e);
+				if(e instanceof AST.cond)
+					visit((AST.cond)e);
+				if(e instanceof AST.let)
+					visit((AST.let)e);
+				if(e instanceof AST.dispatch)
+					visit((AST.dispatch)e);
+				if(e instanceof AST.static_dispatch)
+					visit((AST.static_dispatch)e);
+				if(e instanceof AST.typcase)
+					visit((AST.typcase)e);
+
+	}
+
 	public void visit(AST.no_expr e){
 		e.type = "_no_type";
 	}
@@ -189,7 +248,7 @@ public class Visitor{
 			e.type = GlobalData.currentClass;
 		}
 		else{
-			if(!GlobalData.attrScopeTable.lookUpGlobal(e.name)){
+			if(GlobalData.attrScopeTable.lookUpGlobal(e.name) == null){
 				//error : attribute not defined
 				Semantic.reportError(GlobalData.filename, e.lineNo, "attribute not defined : "+e.name);
 				e.type = GlobalData.Const.ROOT_TYPE;
@@ -204,7 +263,7 @@ public class Visitor{
 		visit(e.e1);
 		if(!(e.e1.type).equals(GlobalData.Const.BOOL_TYPE)){
 			//error : NOT a boolean type expression
-			Semantic.reportError(GlobalData.filename, e.lineNo, "expected a boolean expression : "+e.e1.name);
+			Semantic.reportError(GlobalData.filename, e.lineNo, "expected a boolean expression : "+e.e1.type);
 		}
 		e.type = GlobalData.Const.BOOL_TYPE;
 	}
@@ -333,7 +392,7 @@ public class Visitor{
 	}
 
 	public void vist(AST.loop e){
-		visit(e.predicate);Semantic.reportError(GlobalData.filename, e.lineNo, "types not conforming"+e.typeid);
+		visit(e.predicate);
 		visit(e.body);
 		if(!e.predicate.type.equals(GlobalData.Const.BOOL_TYPE)){
 			//error: Predicate is not of type bool.
@@ -360,7 +419,7 @@ public class Visitor{
 
 	public void visit(AST.let e){
 		visit(e.value);
-		visit(e.body);
+
 		GlobalData.attrScopeTable.enterScope();
 		if(e.name.equals("self")){
 			//error : cannot use self in let expression
@@ -372,6 +431,7 @@ public class Visitor{
 				GlobalData.attrScopeTable.insert(e.name,GlobalData.Const.BOOL_TYPE);
 			}
 			else{
+				//System.out.println("inserting into scope in let :"+e.name);
 				GlobalData.attrScopeTable.insert(e.name,e.typeid);
 			}
 			if(!(e.value instanceof AST.no_expr)){
@@ -381,6 +441,7 @@ public class Visitor{
 				}
 			}
 		}
+		visit(e.body);
 		e.type = e.body.type;
 		GlobalData.attrScopeTable.exitScope();
 	}
@@ -390,19 +451,22 @@ public class Visitor{
 		for(AST.expression e1 : e.actuals){
 			visit(e1);
 		}
-		String class = e.caller.type;
-		String mangledName = GlobalData.mangledNameWithExpr(class,e.name,e.actuals);
+		String cl = e.caller.type;
+		String mangledName = GlobalData.mangledNameWithExpr(cl,e.name,e.actuals);
+	//	System.out.println("mangled name with expressions : " + mangledName);
 		String type = GlobalData.methodReturnTable.get(mangledName);
 
-		while(class != null){
-			class = GlobalData.classTable.get(class)
-			mangledName = GlobalData.mangledNameWithExpr(class,e.name,e.actuals);
+		while(cl != GlobalData.Const.ROOT_TYPE){
+
+			mangledName = GlobalData.mangledNameWithExpr(cl,e.name,e.actuals);
 			type = GlobalData.methodReturnTable.get(mangledName);
 			if(type != null)
 				break;
+			cl = GlobalData.classTable.get(cl);
 		}
-		if(class == null){
+		if(cl == GlobalData.Const.ROOT_TYPE){
 			//error : method not defined.
+
 			Semantic.reportError(GlobalData.filename, e.lineNo, "method not defined : "+e.name);
 			e.type = GlobalData.Const.ROOT_TYPE;
 		}
@@ -416,20 +480,20 @@ public class Visitor{
 		for(AST.expression e1: e.actuals){
 			visit(e1);
 		}
-		Stirng class = e.caller.type;
+		String cl = e.caller.type;
 		if(!GlobalData.inheritanceGraph.containsClass(e.typeid)){
 			//error : Type not defined.
 			Semantic.reportError(GlobalData.filename, e.lineNo, "type not defined : "+e.typeid);
 			e.typeid = GlobalData.Const.ROOT_TYPE;
 			e.type = GlobalData.Const.ROOT_TYPE;
 		}
-		else if(!GlobalData.inheritanceGraph.isConforming(e.typeid,class)){
+		else if(!GlobalData.inheritanceGraph.isConforming(e.typeid,cl)){
 			//error: types not conforming.
 			Semantic.reportError(GlobalData.filename, e.lineNo, "types not conforming : "+e.typeid);
 			e.type = GlobalData.Const.ROOT_TYPE;
 		}
 		else{
-			String mangledName = GlobalData.mangledNameWithExpr(class,e.name,e.actuals);
+			String mangledName = GlobalData.mangledNameWithExpr(cl,e.name,e.actuals);
 			String type = GlobalData.methodReturnTable.get(mangledName);
 			if(type == null){
 				//error : method not defined.
@@ -448,7 +512,7 @@ public class Visitor{
 		e.type = e.branches.get(0).value.type;
 		for(int i =1;i<e.branches.size();i++){
 			visit(e.branches.get(i));
-			e.type = GlobalData.inheritanceGraph.getSuperClass(e.type,e.branches.get(i));
+			e.type = GlobalData.inheritanceGraph.getSuperClass(e.type,e.branches.get(i).type);
 		}
 	}
 
@@ -462,7 +526,7 @@ public class Visitor{
 		else{
 			if(!GlobalData.inheritanceGraph.containsClass(e.type)){
 				//error : Type does not exist.
-				Semantic.reportError(GlobalData.filename, e.lineNo, "types does not exist : "+e.typeid);
+				Semantic.reportError(GlobalData.filename, e.lineNo, "types does not exist : "+e.type);
 				e.type = GlobalData.Const.ROOT_TYPE;
 			}
 			GlobalData.attrScopeTable.insert(e.name,e.type);

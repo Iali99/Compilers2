@@ -17,13 +17,28 @@ public class GlobalData{
             if(name.equals(INT_TYPE)) return true;
             return false;
         }
+        public static final boolean is_standard_class_name(String name){
+            if(name.equals(ROOT_TYPE)) return true;
+            if(name.equals(IO_TYPE)) return true;
+            if(name.equals(STRING_TYPE)) return true;
+            if(name.equals(BOOL_TYPE)) return true;
+            if(name.equals(INT_TYPE)) return true;
+            return false;
+        }
+        public static final boolean is_inheritable(String name){
+            if(name.equals(MAIN_TYPE)) return false;
+            if(name.equals(STRING_TYPE)) return false;
+            if(name.equals(BOOL_TYPE)) return false;
+            if(name.equals(INT_TYPE)) return false;
+            return true;
+        }
     }
 
-  public static AST.class_ ROOT_CLASS = new AST.class_(Const.ROOT_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
-  public static AST.class_ IO_CLASS   = new AST.class_(Const.IO_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
-  public static AST.class_ INT_CLASS = new AST.class_(Const.INT_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
-  public static AST.class_ BOOL_CLASS = new AST.class_(Const.BOOL_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
-  public static AST.class_ STRING_CLASS = new AST.class_(Const.STRING_TYPE, "", Const.ROOT_TYPE, new List<feature>, 0);
+  public static AST.class_ ROOT_CLASS = new AST.class_(Const.ROOT_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
+  public static AST.class_ IO_CLASS   = new AST.class_(Const.IO_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
+  public static AST.class_ INT_CLASS = new AST.class_(Const.INT_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
+  public static AST.class_ BOOL_CLASS = new AST.class_(Const.BOOL_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
+  public static AST.class_ STRING_CLASS = new AST.class_(Const.STRING_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
 
 
   // ClassTable - maps class name to class parent
@@ -72,10 +87,10 @@ public class GlobalData{
     return mangledName.toString();
   }
 
-  public static String mangledNameWithExpr(String class,String name,List<AST.expression> elist)
+  public static String mangledNameWithExpr(String cl,String name,List<AST.expression> elist)
   {
     StringBuilder mangledName = new StringBuilder();
-    mangledName.append(class).append("$");
+    mangledName.append(cl).append("$");
     mangledName.append(name).append("$");
     mangledName.append("_NP").append(elist.size()).append("$");
     if(elist.size() != 0)
@@ -89,7 +104,7 @@ public class GlobalData{
   }
 
   //to check if a method has arguments.
-  public boolean hasArguments(String name)
+  public static boolean hasArguments(String name)
   {
     if(name.contains("_NP0"))
       return false;

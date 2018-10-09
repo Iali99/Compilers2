@@ -24,27 +24,40 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 		setChildren();
   }
 
-  public List<AST.class_> getClassList(){
-    List<AST.class_> cl_list = new List<AST.class_>();
-    for(String it : GlobalData.classTable){
-      cl_list.add(graph.get(it));
-    } 
+  public AST.class_ getRootClass(){
+    return graph.get(GlobalData.Const.ROOT_TYPE);
+  }
+
+  public ArrayList<AST.class_> getClassList(){
+    ArrayList<AST.class_> cl_list = new ArrayList<AST.class_>();
+    Iterator it = GlobalData.classTable.entrySet().iterator();
+    while(it.hasNext()){
+      HashMap.Entry pair = (HashMap.Entry)it.next();
+      cl_list.add(graph.get(pair.getKey()));
+    }
+    // for(String it : GlobalData.classTable){
+    //   cl_list.add(graph.get(it));
+    // }
     return cl_list;
   }
 
   public void traverseGraph(AST.class_ node){
     // visit current node
-    visit(node);
-    // enter scope
-    GlobalData.attrScopeTable.enterScope();
-    GlobalData.methodScopeTable.enterScope();
+    Visitor v = new Visitor();
+    v.visit(node);
+
     // recursively traverse every child
     for(String it : node.children){
+      // enter scope
+      GlobalData.attrScopeTable.enterScope();
+      GlobalData.methodScopeTable.enterScope();
+      
       traverseGraph(graph.get(it));
+      // exit scope
+      GlobalData.attrScopeTable.exitScope();
+      GlobalData.methodScopeTable.exitScope();
     }
-    // exit scope
-    GlobalData.attrScopeTable.exitScope();
-    GlobalData.methodScopeTable.exitScope();
+
   }
 
   public void checkGraph(){
@@ -52,7 +65,10 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 
 		// go to each class and add it to classTable
 		for(AST.class_ iter : classes){
-			if(GlobalData.classTable.containsKey(iter.name)){
+      if(GlobalData.Const.is_standard_class_name(iter.name)){
+        Semantic.reportError(GlobalData.filename, iter.lineNo, "standard class cannot be redefined : "+iter.name);
+      }
+			else if(GlobalData.classTable.containsKey(iter.name)){
 				Semantic.reportError(GlobalData.filename, iter.lineNo, "class redefined : " + iter.name);
 			}
 			else
@@ -75,7 +91,7 @@ public class InheritanceGraph implements InheritanceGraphInterface{
         }
 				else Semantic.reportError(GlobalData.filename, iter.lineNo, "class does not exist : " + parent);
         // recover
-        iter.parent = GlobalData.ROOT_CLASS;
+        iter.parent = GlobalData.Const.ROOT_TYPE;
         GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
       }
 			else{
@@ -99,9 +115,10 @@ public class InheritanceGraph implements InheritanceGraphInterface{
   {
     return graph.containsKey(classname);
   }
-  
+
   //insert a class in the inheritance graph.
   public void insert(AST.class_ c){
+    GlobalData.filename = c.filename;
      graph.put(c.name,c);
   }
 
@@ -111,19 +128,19 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     Iterator it = GlobalData.classTable.entrySet().iterator();
     while(it.hasNext()){
       HashMap.Entry pair = (HashMap.Entry)it.next();
-      if(!pair.getValue().equals(GlobalData.Const.ROOT_TYPE)){
+      // if(!pair.getValue().equals(GlobalData.Const.ROOT_TYPE)){
         //parentClass gets the parent class from the inheritance graph.
         AST.class_ parentClass = graph.get(pair.getValue());
         //The current iterating class is added as child to its parent class.
         parentClass.AddChild((String)pair.getKey());
         //Parent class is updated in the inheritance graph.
         graph.put((String)pair.getValue(),parentClass);
-      }
+      // }
     }
   }
 
   // returns super class of cl1 and cl2
-  public String getSuper(String cl1, String cl2){
+  public String getSuperClass(String cl1, String cl2){
     if(isConforming(cl1, cl2)) return cl1;
     else if(isConforming(cl2, cl1)) return cl2;
     else return GlobalData.Const.ROOT_TYPE;
