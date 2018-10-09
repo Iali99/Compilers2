@@ -23,7 +23,7 @@ public class Visitor{
                     GlobalData.methodReturnTable.put(GlobalData.mangledNameWithClass(m), m.typeid);
                 }
             }
-        } 
+        }
     }
 
 	public void visit(AST.class_ c){
@@ -128,10 +128,10 @@ public class Visitor{
 		for(AST.formal fl : m.formals){
 			if(fl.name.equals("self")){
 				// error self cant be name
-				Semantic.reportError(GlobalData.filename, m.lineNo, "self can not be a formal name : "+fl.name);				
+				Semantic.reportError(GlobalData.filename, m.lineNo, "self can not be a formal name : "+fl.name);
 			}else if(flist.contains(fl.name)){
 				// error formal redefined
-				Semantic.reportError(GlobalData.filename, fl.lineNo, "formal can not be redefined : "+fl.name);				
+				Semantic.reportError(GlobalData.filename, fl.lineNo, "formal can not be redefined : "+fl.name);
 
 			}else{
 				flist.add(fl.name);
@@ -157,7 +157,7 @@ public class Visitor{
 		// check for undefined type
 		if(GlobalData.inheritanceGraph.containsClass(f.typeid)){
 			// error undefined type
-			Semantic.reportError(GlobalData.filename, f.lineNo, "type not defined : "+f.typeid);				
+			Semantic.reportError(GlobalData.filename, f.lineNo, "type not defined : "+f.typeid);
 		}
 		else{
 			GlobalData.attrScopeTable.insert(f.name, f.typeid);
@@ -180,11 +180,27 @@ public class Visitor{
 		e.type = GlobalData.Const.INT_TYPE;
 	}
 
+	public void visit(AST.object e){
+		if(e.name.equals("self")){
+			e.type = GlobalData.currentClass;
+		}
+		else{
+			if(!GlobalData.attrScopeTable.lookUpGlobal(e.name)){
+				//error : attribute not defined
+				Semantic.reportError(GlobalData.filename, e.lineNo, "attribute not defined : "+e.name);
+				e.type = GlobalData.Const.ROOT_TYPE;
+			}
+			else{
+				e.type = GlobalData.attrScopeTable.lookUpGlobal(e.name);
+			}
+		}
+	}
+
 	public void visit(AST.comp e){
 		visit(e.e1);
 		if(!(e.e1.type).equals(GlobalData.Const.BOOL_TYPE)){
 			//error : NOT a boolean type expression
-			Semantic.reportError(GlobalData.filename, e.lineNo, "expected a boolean expression : "+e.e1.name);				
+			Semantic.reportError(GlobalData.filename, e.lineNo, "expected a boolean expression : "+e.e1.name);
 		}
 		e.type = GlobalData.Const.BOOL_TYPE;
 	}
@@ -217,6 +233,15 @@ public class Visitor{
 			Semantic.reportError(GlobalData.filename, e.lineNo, "expected type INT");
 		}
 		e.type = GlobalData.Const.BOOL_TYPE;
+	}
+
+	public void visit(AST.neg e){
+			visit(e.e1);
+			if(!e.e1.type.equals(GlobalData.Const.INT_TYPE)){
+				//error : Non Int type
+				Semantic.reportError(GlobalData.filename, e.lineNo, "Expected type int : "+e.type);
+			}
+			e.type = GlobalData.Const.INT_TYPE;
 	}
 
 	public void visit(AST.divide e){
@@ -277,14 +302,20 @@ public class Visitor{
 
 	public void visit(AST.assign e){
 		visit(e.e1);
-		if(!(GlobalData.attrScopeTable.lookUpGlobal(e.name)).equals(e.e1.type)){
-			if(GlobalData.attrScopeTable.lookUpGlobal(e.name) == null){
-				//error : attr not declared.
-				Semantic.reportError(GlobalData.filename, e.lineNo, "attribute not declared : "+e.name);
-			}
-			else{
-				//error : Types do not match for assignment
-				Semantic.reportError(GlobalData.filename, e.lineNo, "types not matched : "+e.name);
+		if(e.name.equals("self")){
+			//error: Cannot have self as attribute name.
+			Semantic.reportError(GlobalData.filename, e.lineNo, "Cannot have self as attribute name");
+		}
+		else{
+			if(!(GlobalData.attrScopeTable.lookUpGlobal(e.name)).equals(e.e1.type)){
+				if(GlobalData.attrScopeTable.lookUpGlobal(e.name) == null){
+					//error : attr not declared.
+					Semantic.reportError(GlobalData.filename, e.lineNo, "attribute not declared : "+e.name);
+				}
+				else{
+					//error : Types do not match for assignment
+					Semantic.reportError(GlobalData.filename, e.lineNo, "types not matched : "+e.name);
+				}
 			}
 		}
 		e.type = e.e1.type;
@@ -298,7 +329,7 @@ public class Visitor{
 	}
 
 	public void vist(AST.loop e){
-		visit(e.predicate);
+		visit(e.predicate);Semantic.reportError(GlobalData.filename, e.lineNo, "types not conforming"+e.typeid);
 		visit(e.body);
 		if(!e.predicate.type.equals(GlobalData.Const.BOOL_TYPE)){
 			//error: Predicate is not of type bool.
@@ -327,18 +358,23 @@ public class Visitor{
 		visit(e.value);
 		visit(e.body);
 		GlobalData.attrScopeTable.enterScope();
-		if(!GlobalData.inheritanceGraph.containsClass(e.typeid)){
-			//error : Type not defined.
-			Semantic.reportError(GlobalData.filename, e.lineNo, "Type not defined : "+e.typeid);
-			GlobalData.attrScopeTable.insert(e.name,GlobalData.Const.BOOL_TYPE);
+		if(e.name.equals("self")){
+			//error : cannot use self in let expression
 		}
 		else{
-			GlobalData.attrScopeTable.insert(e.name,e.typeid);
-		}
-		if(!(e.value instanceof AST.no_expr)){
-			if(!GlobalData.inheritanceGraph.isConforming(e.typeid,e.value.type)){
-				//error : types not conforming for assignment.
-				Semantic.reportError(GlobalData.filename, e.lineNo, "types not conforming"+e.typeid);
+			if(!GlobalData.inheritanceGraph.containsClass(e.typeid)){
+				//error : Type not defined.
+				Semantic.reportError(GlobalData.filename, e.lineNo, "Type not defined : "+e.typeid);
+				GlobalData.attrScopeTable.insert(e.name,GlobalData.Const.BOOL_TYPE);
+			}
+			else{
+				GlobalData.attrScopeTable.insert(e.name,e.typeid);
+			}
+			if(!(e.value instanceof AST.no_expr)){
+				if(!GlobalData.inheritanceGraph.isConforming(e.typeid,e.value.type)){
+					//error : types not conforming for assignment.
+					Semantic.reportError(GlobalData.filename, e.lineNo, "types not conforming"+e.typeid);
+				}
 			}
 		}
 		e.type = e.body.type;
