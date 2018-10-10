@@ -16,10 +16,10 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     for(AST.class_ iter : p.classes){
       insert(iter);
     }
-    // GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
-    // GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
-    // GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
-    // GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
     checkGraph();
 		setChildren();
   }
@@ -30,7 +30,7 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 
   public ArrayList<AST.class_> getClassList(){
     ArrayList<AST.class_> cl_list = new ArrayList<AST.class_>();
-    // adding all standard classes as well 
+    // adding all standard classes as well
     cl_list.add(GlobalData.ROOT_CLASS);
     cl_list.add(GlobalData.STRING_CLASS);
     cl_list.add(GlobalData.BOOL_CLASS);
@@ -58,7 +58,7 @@ public class InheritanceGraph implements InheritanceGraphInterface{
       // enter scope
       GlobalData.attrScopeTable.enterScope();
       GlobalData.methodScopeTable.enterScope();
-      
+
       traverseGraph(graph.get(it));
       // exit scope
       GlobalData.attrScopeTable.exitScope();
@@ -91,13 +91,16 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 			}
 			// check existence of parent
 			if(!GlobalData.classTable.containsKey(parent)){
-        // if parent is standard
-        if(!GlobalData.Const.is_inheritable(parent)){
-          // error standard class as parent
-          Semantic.reportError(GlobalData.filename, iter.lineNo, "standard class can't be inherited : " + parent);
+			  Semantic.reportError(GlobalData.filename, iter.lineNo, "class does not exist : " + parent);
+        // if parent is not inheritable is_standard then recover
+        if(!GlobalData.Const.is_inheritable_standard(parent)){
+          // recover
+          iter.parent = GlobalData.Const.ROOT_TYPE;
+          GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
         }
-				else Semantic.reportError(GlobalData.filename, iter.lineNo, "class does not exist : " + parent);
-        // recover
+      }else if(!GlobalData.Const.is_inheritable(parent)){
+        // error standard class as parent
+        Semantic.reportError(GlobalData.filename, iter.lineNo, "standard class can't be inherited : " + parent);
         iter.parent = GlobalData.Const.ROOT_TYPE;
         GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
       }
@@ -150,16 +153,28 @@ public class InheritanceGraph implements InheritanceGraphInterface{
   public String getSuperClass(String cl1, String cl2){
     if(isConforming(cl1, cl2)) return cl1;
     else if(isConforming(cl2, cl1)) return cl2;
-    else return GlobalData.Const.ROOT_TYPE;
+    else {
+      String parent = GlobalData.classTable.get(cl1);
+      while(!(isConforming(parent,cl2))){
+        if(parent.equals(GlobalData.Const.ROOT_TYPE))
+          return GlobalData.Const.ROOT_TYPE;
+        parent = GlobalData.classTable.get(parent);
+      }
+      return parent;
+    }
   }
 
   // checks if cl can be returned for super_cl
   public boolean isConforming(String super_cl, String cl){
+    // if(cl==null || super_cl==null) return false;
     // if super_cl and cl are same or super_cl is root type
-    if(cl.equals(super_cl) || super.equals(GlobalData.Const.ROOT_TYPE)) return true;
+    if(cl.equals(super_cl) || super_cl.equals(GlobalData.Const.ROOT_TYPE)) return true;
+    if(cl.equals(GlobalData.Const.ROOT_TYPE)) return false;
     // if super_cl or cl is standard type
     if(GlobalData.Const.is_standard(super_cl) || GlobalData.Const.is_standard(cl)) return false;
     String parent = GlobalData.classTable.get(cl);
+    // if(parent == null)
+    //   System.out.println("parent becoming null for class : " + cl);
     while(!parent.equals(GlobalData.Const.ROOT_TYPE)){
       if(parent.equals(super_cl)) return true;
       parent = GlobalData.classTable.get(parent);

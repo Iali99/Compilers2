@@ -32,6 +32,11 @@ public class GlobalData{
             if(name.equals(INT_TYPE)) return false;
             return true;
         }
+        public static final boolean is_inheritable_standard(String name){
+          if(name.equals(ROOT_TYPE)) return true;
+          if(name.equals(IO_TYPE)) return true;
+          return false;
+        }
     }
 
   public static AST.class_ ROOT_CLASS = new AST.class_(Const.ROOT_TYPE, "", Const.ROOT_TYPE, getRootFeatures(), 0);
@@ -87,6 +92,15 @@ public class GlobalData{
     featureList.add(new AST.method("in_int", new ArrayList<>(), Const.INT_TYPE, null, 0));
 
     return featureList;
+  }
+
+  public static void insertRootMethodToScope(){
+    for(AST.feature m : getRootFeatures()){
+      if(m instanceof AST.method){
+        String thisTypeMangledName = GlobalData.mangledNameWithType((AST.method)m);
+        GlobalData.methodScopeTable.insert(((AST.method)m).name, thisTypeMangledName);
+      }
+    }
   }
 
   // ClassTable - maps class name to class parent

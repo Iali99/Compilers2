@@ -12,7 +12,7 @@ public class Visitor{
 		updateMangledNames();
 		GlobalData.inheritanceGraph.traverseGraph(GlobalData.inheritanceGraph.getRootClass());
 
-		GlobalData.inheritanceGraph.printGraph();
+		// GlobalData.inheritanceGraph.printGraph();
 	}
 
 	// For all the methods in all the classes
@@ -21,7 +21,6 @@ public class Visitor{
             for(AST.feature f: cl.features){
                 if(f instanceof AST.method){
                     AST.method m = (AST.method) f;
-									//	System.out.println("Inserting into methodReturnTable : "+ GlobalData.mangledNameWithClass(cl.name ,m));
                     GlobalData.methodReturnTable.put(GlobalData.mangledNameWithClass(cl.name ,m), m.typeid);
                 }
             }
@@ -29,19 +28,21 @@ public class Visitor{
     }
 
 	public void visit(AST.class_ c){
-        GlobalData.currentClass = c.name;
-		// visiting all its features for semantics
-        for(AST.feature f: c.features){
-            if(f instanceof AST.attr){ // Its an attribute
+		// visitor for class
 
-                AST.attr a = (AST.attr) f;
-                visit(a);
-            }else{ // Its a method
+    GlobalData.currentClass = c.name;
+// visiting all its features for semantics
+    for(AST.feature f: c.features){
+        if(f instanceof AST.attr){ // Its an attribute
 
-                AST.method m = (AST.method) f;
-                visit(m);
-            }
+            AST.attr a = (AST.attr) f;
+            visit(a);
+        }else{ // Its a method
+
+            AST.method m = (AST.method) f;
+            visit(m);
         }
+    }
 		// if this is main class
 		if(c.name.equals(GlobalData.Const.MAIN_TYPE)){
 			// main class
@@ -55,10 +56,8 @@ public class Visitor{
 			}
 		}
 
-		// visitor for class
-		if(GlobalData.Const.is_standard(c.name)){
-			return;
-		}
+		return;
+
 	}
 
 	// public void visit(AST.expression e){
@@ -148,14 +147,16 @@ public class Visitor{
 			visit(fl);
 		}
 		// visit method body
-		visit(m.body);
+		if(m.body!=null){
+			visit(m.body);
 
-		// check conformance of method's return type and body return type
-		if(!GlobalData.inheritanceGraph.isConforming(m.typeid, m.body.type)){
-			// error types not conforming
-			Semantic.reportError(GlobalData.filename, m.lineNo, "return type not conforming with method body type : "+m.typeid);
-			// recover
-			m.typeid = GlobalData.Const.ROOT_TYPE;
+			// check conformance of method's return type and body return type
+			if(!GlobalData.inheritanceGraph.isConforming(m.typeid, m.body.type)){
+				// error types not conforming
+				Semantic.reportError(GlobalData.filename, m.lineNo, "return type not conforming with method body type : "+m.typeid);
+				// recover
+				m.typeid = GlobalData.Const.ROOT_TYPE;
+			}
 		}
 		// exit scope
 		GlobalData.attrScopeTable.exitScope();
@@ -176,6 +177,7 @@ public class Visitor{
 	}
 
 	public void visit(AST.expression e){
+				if(e == null) return;
 				if(e instanceof AST.no_expr)
 					visit((AST.no_expr)e);
 				if(e instanceof AST.bool_const)
@@ -212,8 +214,10 @@ public class Visitor{
 					visit((AST.assign)e);
 				if(e instanceof AST.block)
 					visit((AST.block)e);
-				if(e instanceof AST.loop)
+				if(e instanceof AST.loop){
 					visit((AST.loop)e);
+				}
+
 				if(e instanceof AST.cond)
 					visit((AST.cond)e);
 				if(e instanceof AST.let)
@@ -224,7 +228,7 @@ public class Visitor{
 					visit((AST.static_dispatch)e);
 				if(e instanceof AST.typcase)
 					visit((AST.typcase)e);
-
+				return;
 	}
 
 	public void visit(AST.no_expr e){
@@ -314,7 +318,7 @@ public class Visitor{
 			//error : NON INT types. Operation cannot be done.
 			Semantic.reportError(GlobalData.filename, e.lineNo, "expected type INT");
 		}
-		e.type = GlobalData.Const.BOOL_TYPE;
+		e.type = GlobalData.Const.INT_TYPE;
 	}
 
 	public void visit(AST.mul e){
@@ -324,7 +328,7 @@ public class Visitor{
 			//error : NON INT types. Operation cannot be done.
 			Semantic.reportError(GlobalData.filename, e.lineNo, "expected type INT");
 		}
-		e.type = GlobalData.Const.BOOL_TYPE;
+		e.type = GlobalData.Const.INT_TYPE;
 	}
 
 	public void visit(AST.sub e){
@@ -334,7 +338,7 @@ public class Visitor{
 			//error : NON INT types. Operation cannot be done.
 			Semantic.reportError(GlobalData.filename, e.lineNo, "expected type INT");
 		}
-		e.type = GlobalData.Const.BOOL_TYPE;
+		e.type = GlobalData.Const.INT_TYPE;
 	}
 
 	public void visit(AST.plus e){
@@ -344,12 +348,13 @@ public class Visitor{
 			//error : NON INT types. Operation cannot be done.
 			Semantic.reportError(GlobalData.filename, e.lineNo, "expected type INT");
 		}
-		e.type = GlobalData.Const.BOOL_TYPE;
+		e.type = GlobalData.Const.INT_TYPE;
 	}
 
 	public void visit(AST.isvoid e){
 		visit(e.e1);
 		e.e1.type = GlobalData.Const.BOOL_TYPE;
+		e.type = GlobalData.Const.BOOL_TYPE;
 	}
 
 	public void visit(AST.new_ e){
@@ -391,7 +396,7 @@ public class Visitor{
 		e.type = e.l1.get(e.l1.size()-1).type;
 	}
 
-	public void vist(AST.loop e){
+	public void visit(AST.loop e){
 		visit(e.predicate);
 		visit(e.body);
 		if(!e.predicate.type.equals(GlobalData.Const.BOOL_TYPE)){
@@ -409,12 +414,7 @@ public class Visitor{
 			//error: Predicate is not of type bool.
 			Semantic.reportError(GlobalData.filename, e.lineNo, "predicate is not of type boolean");
 		}
-		if(e.ifbody.type.equals(e.elsebody.type)){
-			e.type = e.ifbody.type;
-		}
-		else{
-			e.type = GlobalData.Const.ROOT_TYPE;
-		}
+		e.type = GlobalData.inheritanceGraph.getSuperClass(e.ifbody.type,e.elsebody.type);
 	}
 
 	public void visit(AST.let e){
@@ -431,7 +431,6 @@ public class Visitor{
 				GlobalData.attrScopeTable.insert(e.name,GlobalData.Const.BOOL_TYPE);
 			}
 			else{
-				//System.out.println("inserting into scope in let :"+e.name);
 				GlobalData.attrScopeTable.insert(e.name,e.typeid);
 			}
 			if(!(e.value instanceof AST.no_expr)){
@@ -453,7 +452,6 @@ public class Visitor{
 		}
 		String cl = e.caller.type;
 		String mangledName = GlobalData.mangledNameWithExpr(cl,e.name,e.actuals);
-	//	System.out.println("mangled name with expressions : " + mangledName);
 		String type = GlobalData.methodReturnTable.get(mangledName);
 
 		while(cl != GlobalData.Const.ROOT_TYPE){
@@ -466,9 +464,12 @@ public class Visitor{
 		}
 		if(cl == GlobalData.Const.ROOT_TYPE){
 			//error : method not defined.
-
-			Semantic.reportError(GlobalData.filename, e.lineNo, "method not defined : "+e.name);
-			e.type = GlobalData.Const.ROOT_TYPE;
+			mangledName = GlobalData.mangledNameWithExpr(cl,e.name,e.actuals);
+			type = GlobalData.methodReturnTable.get(mangledName);
+			if(type == null){
+				Semantic.reportError(GlobalData.filename, e.lineNo, "method not defined : "+e.name);
+				e.type = GlobalData.Const.ROOT_TYPE;
+			}
 		}
 		else{
 			e.type = type;
