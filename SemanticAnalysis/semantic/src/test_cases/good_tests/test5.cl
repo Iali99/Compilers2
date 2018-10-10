@@ -6,20 +6,17 @@ class B {
     b : Bool;
     c : Bool;
     d : Bool;
-    f1() : Int {
+    f1() : Bool {
         {
-            ~a;
-            ~c;
-            ~d;
-            0;
+            a;
         }
     };
-    f2() : Int {
+    f2() : Bool {
         {
             not a;
             not b;
             not c;
-            0;
+            b;
         }
     };
 };

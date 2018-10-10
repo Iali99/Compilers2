@@ -14,7 +14,6 @@ class B {
     f2(x : Bool, y : Bool, z : Int) : Int {
         {
             while x loop z <- z+1 pool;
-            while y loop z <- z+1 pool;
             0;
         }
     };

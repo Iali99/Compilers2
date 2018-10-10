@@ -21,7 +21,7 @@ class E {
     c : C <- new C;
     d : D <- new D;
     f1() : Int {
-        let x : A <- c, y : B <- b, z : B <- c, w : d <- d in 
+        let x : A <- c, y : B <- b, z : B <- c, w : D <- d in 
         {
             0;
         }
