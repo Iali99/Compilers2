@@ -30,6 +30,13 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 
   public ArrayList<AST.class_> getClassList(){
     ArrayList<AST.class_> cl_list = new ArrayList<AST.class_>();
+    // adding all standard classes as well 
+    cl_list.add(GlobalData.ROOT_CLASS);
+    cl_list.add(GlobalData.STRING_CLASS);
+    cl_list.add(GlobalData.BOOL_CLASS);
+    cl_list.add(GlobalData.INT_CLASS);
+    cl_list.add(GlobalData.IO_CLASS);
+    // adding remaining classes
     Iterator it = GlobalData.classTable.entrySet().iterator();
     while(it.hasNext()){
       HashMap.Entry pair = (HashMap.Entry)it.next();

@@ -34,12 +34,58 @@ public class GlobalData{
         }
     }
 
-  public static AST.class_ ROOT_CLASS = new AST.class_(Const.ROOT_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
-  public static AST.class_ IO_CLASS   = new AST.class_(Const.IO_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
-  public static AST.class_ INT_CLASS = new AST.class_(Const.INT_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
-  public static AST.class_ BOOL_CLASS = new AST.class_(Const.BOOL_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
-  public static AST.class_ STRING_CLASS = new AST.class_(Const.STRING_TYPE, "", Const.ROOT_TYPE, new ArrayList<AST.feature>(), 0);
+  public static AST.class_ ROOT_CLASS = new AST.class_(Const.ROOT_TYPE, "", Const.ROOT_TYPE, getRootFeatures(), 0);
+  public static AST.class_ IO_CLASS   = new AST.class_(Const.IO_TYPE, "", Const.ROOT_TYPE, getIOFeatures(), 0);
+  public static AST.class_ INT_CLASS = new AST.class_(Const.INT_TYPE, "", Const.ROOT_TYPE, getIntFeatures(), 0);
+  public static AST.class_ BOOL_CLASS = new AST.class_(Const.BOOL_TYPE, "", Const.ROOT_TYPE, getBoolFeatures(), 0);
+  public static AST.class_ STRING_CLASS = new AST.class_(Const.STRING_TYPE, "", Const.ROOT_TYPE, getStringFeatures(), 0);
 
+  // features of ROOT_CLASS
+  public ArrayList<AST.feature> getRootFeatures(){
+    ArrayList<AST.feature> featureList = new ArrayList<AST.feature>();
+    featureList.add(new AST.method("abort", new ArrayList<>(), Consts.ROOT_TYPE, null, 0));
+    featureList.add(new AST.method("type_name", new ArrayList<>(), Consts..STRING_TYPE, null, 0));
+    featureList.add(new AST.method("copy", new ArrayList<>(), Consts..ROOT_TYPE, null, 0));
+    return featureList;
+  }
+  // features of STRING_CLASS
+  public ArrayList<AST.feature> getStringFeatures(){
+    ArrayList<AST.feature> featureList = new ArrayList<AST.feature>();
+
+    List<AST.formal> stringFormalList = new ArrayList<>(Arrays.asList(new AST.formal("x", Global.Constants.STRING_TYPE, 0)));
+    List<AST.formal> intFormalList = new ArrayList<>(Arrays.asList(new AST.formal("x", Global.Constants.INT_TYPE, 0)
+        ,new AST.formal("y", Global.Constants.INT_TYPE, 0)));
+
+    featureList.add(new AST.method("length", new ArrayList<>(), Global.Constants.INT_TYPE, null, 0));
+    featureList.add(new AST.method("concat", stringFormalList, Global.Constants.STRING_TYPE, null, 0));
+    featureList.add(new AST.method("substr", intFormalList, Global.Constants.STRING_TYPE, null, 0));
+
+    return featureList;
+  }
+  // features of BOOL_CLASS
+  public ArrayList<AST.feature> getBoolFeatures(){
+    ArrayList<AST.feature> featureList = new ArrayList<AST.feature>();
+    return featureList;
+  }  
+  // features of INT_CLASS
+  public ArrayList<AST.feature> getIntFeatures(){
+    ArrayList<AST.feature> featureList = new ArrayList<AST.feature>();
+    return featureList;
+  }
+  // features of IO_CLASS
+  public ArrayList<AST.feature> getIOFeatures(){
+    ArrayList<AST.feature> featureList = new ArrayList<AST.feature>();
+
+    List<AST.formal> stringFormalList = new ArrayList<>(Arrays.asList(new AST.formal("x", Global.Constants.STRING_TYPE, 0)));
+    List<AST.formal> intFormalList = new ArrayList<>(Arrays.asList(new AST.formal("x", Global.Constants.INT_TYPE, 0)));
+
+    featureList.add(new AST.method("out_string", stringFormalList, Global.Constants.IO_TYPE, null, 0));
+    featureList.add(new AST.method("out_int", intFormalList, Global.Constants.IO_TYPE, null, 0));
+    featureList.add(new AST.method("in_string", new ArrayList<>(), Global.Constants.STRING_TYPE, null, 0));
+    featureList.add(new AST.method("in_int", new ArrayList<>(), Global.Constants.INT_TYPE, null, 0));
+
+    return featureList;
+  } 
 
   // ClassTable - maps class name to class parent
   public static HashMap<String, String> classTable;
