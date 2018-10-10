@@ -92,7 +92,7 @@ public class InheritanceGraph implements InheritanceGraphInterface{
 			// check existence of parent
 			if(!GlobalData.classTable.containsKey(parent)){
         // if parent is standard
-        if(GlobalData.Const.is_standard(parent)){
+        if(!GlobalData.Const.is_inheritable(parent)){
           // error standard class as parent
           Semantic.reportError(GlobalData.filename, iter.lineNo, "standard class can't be inherited : " + parent);
         }
