@@ -65,11 +65,13 @@ public class GlobalData{
   // features of BOOL_CLASS
   public ArrayList<AST.feature> getBoolFeatures(){
     ArrayList<AST.feature> featureList = new ArrayList<AST.feature>();
+    
     return featureList;
   }  
   // features of INT_CLASS
   public ArrayList<AST.feature> getIntFeatures(){
     ArrayList<AST.feature> featureList = new ArrayList<AST.feature>();
+
     return featureList;
   }
   // features of IO_CLASS
