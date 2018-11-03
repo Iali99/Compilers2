@@ -7,6 +7,7 @@ public class GlobalData{
   //Counter for register variables
   public static int Counter;
 
+  //Function to get the mangled name of a function.
   public static String mangledName(String classname, AST.method m)
   {
     StringBuilder mangledName = new StringBuilder();
