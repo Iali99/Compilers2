@@ -9,19 +9,19 @@ public class InheritanceGraph{
   public InheritanceGraph(AST.program pr){
     p = pr;
     // TODO: insert default classes
-    // insert(GlobalData.ROOT_CLASS);
-    // insert(GlobalData.IO_CLASS);
-    // insert(GlobalData.BOOL_CLASS);
-    // insert(GlobalData.INT_CLASS);
-    // insert(GlobalData.STRING_CLASS);
+    insert(GlobalData.ROOT_CLASS);
+    insert(GlobalData.IO_CLASS);
+    insert(GlobalData.BOOL_CLASS);
+    insert(GlobalData.INT_CLASS);
+    insert(GlobalData.STRING_CLASS);
     for(AST.class_ iter : p.classes){
       insert(iter);
     }
     // TODO: insert default classes to classTable
-    // GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
-    // GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
-    // GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
-    // GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.IO_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.INT_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
+    GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
     makeClassTable();
     setChildren();
   }
