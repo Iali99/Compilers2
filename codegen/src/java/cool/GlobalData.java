@@ -74,7 +74,7 @@ public class GlobalData{
   //Counter for register variables
   public static int Counter;
   // map from string constant to register
-  public static Map<String,String> strConsToRegister;
+  public static Map<String,int> strConsToRegister;
   //Counter for Global string registers.
   public static int strCounter;
   //Hashmap to store class size vs class name.
@@ -100,5 +100,10 @@ public class GlobalData{
     }
     GlobalData.out.println(builder.toString());
   }
+  static {
+  		strCounter = 0;
+  		strConsToRegister = new Map<String, int>();
+        classTable = new HashMap<String, String>();
+    }
 
 }

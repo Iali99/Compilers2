@@ -20,29 +20,28 @@ public class Default{
 
   public static void addDefaultStrings(){
     if(!GlobalData.strConsToRegister.containsKey("Int")){
-      GlobalData.strConsToRegister.put("Int",strCounter);
-      strCounter++;
+      GlobalData.strConsToRegister.put("Int", GlobalData.strCounter);
+      GlobalData.strCounter++;
     }
     if(!GlobalData.strConsToRegister.containsKey("Bool")){
-      GlobalData.strConsToRegister.put("Bool",strCounter);
-      strCounter++;
+      GlobalData.strConsToRegister.put("Bool", GlobalData.strCounter);
+      GlobalData.strCounter++;
     }
     if(!GlobalData.strConsToRegister.containsKey("String")){
-      GlobalData.strConsToRegister.put("String",strCounter);
-      strCounter++;
+      GlobalData.strConsToRegister.put("String", GlobalData.strCounter);
+      GlobalData.strCounter++;
     }
     if(!GlobalData.strConsToRegister.containsKey("Object")){
-      GlobalData.strConsToRegister.put("Object",strCounter);
-      strCounter++;
+      GlobalData.strConsToRegister.put("Object", GlobalData.strCounter);
+      GlobalData.strCounter++;
     }
     if(!GlobalData.strConsToRegister.containsKey("IO")){
-      GlobalData.strConsToRegister.put("IO",strCounter);
-      strCounter++;
+      GlobalData.strConsToRegister.put("IO", GlobalData.strCounter);
+      GlobalData.strCounter++;
     }
     if(!GlobalData.strConsToRegister.containsKey("Main")){
-      GlobalData.strConsToRegister.put("Main",strCounter);
-      strCounter++;
+      GlobalData.strConsToRegister.put("Main", GlobalData.strCounter);
+      GlobalData.strCounter++;
     }
-
   }
 }
