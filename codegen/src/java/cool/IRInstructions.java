@@ -40,8 +40,37 @@ public class IRInstrucions{
   /* Binary Instructions.
   */
 
-  public static void addBinaryInstruction(String operation,String type, String op1, String op2){
+  //binary instruction based on arguments.
+  public static String addBinaryInstruction(String operation,String type, String op1, String op2){
     StringBuilder builder = new StringBuilder("");
-    
+    type = GlobalData.getTypeOrPtr(type);
+    String retRegister = "%"+GlobalData.Counter;
+    GlobalData.Counter++;
+    builder.append(retRegister).append(" = ").append(operation).append(" nsw ")
+    .append(type).append(" ").append(op1).append(" , ").append(op2);
+    GlobalData.out.println(builder.toString());
+    return retRegister;
+  }
+
+  /* Memory Operation Instructions.
+  */
+  //alloca instruction
+  public static String addAlloca(String type){
+    StringBuilder builder = new StringBuilder("");
+    String retRegister = "%"+GlobalData.Counter;
+    GlobalData.Counter++;
+    type = getType(type);
+    builder.append(retRegister).append(" = alloca ").append(type).append(" , align 8");
+    GlobalData.out.println(builder.toString());
+    return retRegister;
+  }
+
+  public static String addAlloca(String type,String name){
+    StringBuilder builder = new StringBuilder("");
+    String retRegister = "%"+name;
+    GlobalData.Counter++;
+    builder.append(retRegister).append(" = alloca ").append(type).append(" , align 8");
+    GlobalData.out.println(builder.toString());
+    return retRegister;
   }
 }
