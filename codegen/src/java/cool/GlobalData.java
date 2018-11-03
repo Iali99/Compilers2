@@ -7,6 +7,6 @@ public class GlobalData{
   //Counter for register variables
   public static int Counter;
   // map from string constant to register
-  public static Map<String,String> strConsToRegister;
+  public static Map<String,String> strConstToRegister;
 
 }
