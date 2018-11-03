@@ -20,4 +20,17 @@ public class GlobalData{
     return mangledName.toString();
   }
 
+  public static void addStringsAsGlobal(){
+    GlobalData.out.println("");
+    StringBuilder builder = new StringBuilder("");
+    Iterator it = GlobalData.strConsToRegister.entrySet().iterator();
+    while (it.hasNext()) {
+        Map.Entry pair = (Map.Entry)it.next();
+        builder.append("@globalstring").append(pair.getValue())
+        .append(" = private unnamed_addr constant [").append(pair.getKey().length() + 1)
+        .append(" x i8] c\"").append(pair.getKey()).append("\\00\", align 1\n");
+    }
+    GlobalData.out.println(builder.toString());
+  }
+
 }
