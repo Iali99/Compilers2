@@ -7,6 +7,9 @@ public class GlobalData{
   //Counter for register variables
   public static int Counter;
   // map from string constant to register
+<<<<<<< HEAD
+  public static Map<String,String> strConstToRegister;
+=======
   public static Map<String,String> strConsToRegister;
   //Counter for Global string registers.
   public static int strCounter;
@@ -33,5 +36,6 @@ public class GlobalData{
     }
     GlobalData.out.println(builder.toString());
   }
+>>>>>>> be19530c38f825a9a144cbfefba6df24bf2398bd
 
 }
