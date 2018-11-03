@@ -73,4 +73,42 @@ public class IRInstrucions{
     GlobalData.out.println(builder.toString());
     return retRegister;
   }
+
+  //getelementptr instruction
+  public static String addStrGEP(String str){
+    if(!GlobalData.strConsToRegister.containsKey(str))
+      return null;
+    StringBuilder builder = new StringBuilder("");
+    String retRegister = "%"+GlobalData.Counter;
+    GlobalData.Counter++;
+    builder.append(retRegister).append(" = getelementptr inbounds [")
+    .append(str.length()+1).append(" X i8], [").append(str.length()+1)
+    .append(" X i8]* @globalstring").append(GlobalData.strConsToRegister.get(str))
+    .append(" , i32 0 , i32 0");
+    GlobalData.out.println(builder.toString());
+    return retRegister;
+  }
+
+  //public static String addAttrGEP(String type,)
+
+  //load instruction
+  public static String addLoadInstruction(String type, String addr){
+    StringBuilder builder = new StringBuilder("");
+    String retRegister = "%"+GlobalData.Counter;
+    GlobalData.Counter++;
+    builder.append(retRegister).append(" = load ").append(type)
+    .append(" , ").append(type).append("* ").append(addr).append(" , align ")
+    .append(alignment(type));
+    GlobalData.out.println(builder.toString());
+    return retRegister;
+  }
+
+  //store instruction
+  public static void addStoreInstruction(String type, String value, String addr){
+    StringBuilder builder = new StringBuilder("store ");
+    builder.append(type).append(" ").append(value).append(" , ")
+    .append(type).append("* ").append(addr).append(" , align ")
+    .append(alignment(type));
+    GlobalData.out.println(builder.toString());
+  }
 }
