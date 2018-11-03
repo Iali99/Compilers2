@@ -7,6 +7,8 @@ public class GlobalData{
   //Counter for register variables
   public static int Counter;
 
+  //Hashmap to store class size vs class name.
+  public static HashMap<String,Integer> classNameToSize;
   //Function to get the mangled name of a function.
   public static String mangledName(String classname, AST.method m)
   {
