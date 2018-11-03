@@ -8,7 +8,8 @@ public class GlobalData{
   public static int Counter;
   // map from string constant to register
   public static Map<String,String> strConsToRegister;
-
+  //Counter for Global string registers.
+  public static int strCounter;
   //Hashmap to store class size vs class name.
   public static HashMap<String,Integer> classNameToSize;
   //Function to get the mangled name of a function.

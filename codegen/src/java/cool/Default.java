@@ -17,5 +17,32 @@ public class Default{
   /*public static void setDefaultMethodNames(){
 
   }*/
-  
+
+  public static void addDefaultStrings(){
+    if(!GlobalData.strConsToRegister.containsKey("Int")){
+      GlobalData.strConsToRegister.put("Int",strCounter);
+      strCounter++;
+    }
+    if(!GlobalData.strConsToRegister.containsKey("Bool")){
+      GlobalData.strConsToRegister.put("Bool",strCounter);
+      strCounter++;
+    }
+    if(!GlobalData.strConsToRegister.containsKey("String")){
+      GlobalData.strConsToRegister.put("String",strCounter);
+      strCounter++;
+    }
+    if(!GlobalData.strConsToRegister.containsKey("Object")){
+      GlobalData.strConsToRegister.put("Object",strCounter);
+      strCounter++;
+    }
+    if(!GlobalData.strConsToRegister.containsKey("IO")){
+      GlobalData.strConsToRegister.put("IO",strCounter);
+      strCounter++;
+    }
+    if(!GlobalData.strConsToRegister.containsKey("Main")){
+      GlobalData.strConsToRegister.put("Main",strCounter);
+      strCounter++;
+    }
+
+  }
 }
