@@ -37,5 +37,11 @@ public class IRInstrucions{
     GlobalData.out.println(builder.toString());
   }
 
-  
+  /* Binary Instructions.
+  */
+
+  public static void addBinaryInstruction(String operation,String type, String op1, String op2){
+    StringBuilder builder = new StringBuilder("");
+    
+  }
 }
