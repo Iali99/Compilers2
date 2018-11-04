@@ -13,6 +13,6 @@ public class Visitor{
         Default.addDefaultStrings();
         Default.setDefaultClassSizes();
         GlobalData.addStringsAsGlobal();
-        
+        VisitorUtils.addStructsAllClasses();
 	}
 }

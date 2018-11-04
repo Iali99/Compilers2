@@ -8,6 +8,39 @@ public class GlobalData{
 	public static final String BOOL_TYPE = "Bool";
 	public static final String STRING_TYPE = "String";
 	public static final String MAIN_TYPE = "Main";
+	public static final boolean is_structable(String name){
+		if(name.equals(INT_TYPE)) return false;
+        if(name.equals(STRING_TYPE)) return false;
+        if(name.equals(BOOL_TYPE)) return false;
+        return true;
+	}
+	public static final boolean is_standard(String name){
+        if(name.equals(IO_TYPE)) return true;
+        if(name.equals(STRING_TYPE)) return true;
+        if(name.equals(BOOL_TYPE)) return true;
+        if(name.equals(INT_TYPE)) return true;
+        return false;
+    }
+    public static final boolean is_standard_class_name(String name){
+        if(name.equals(ROOT_TYPE)) return true;
+        if(name.equals(IO_TYPE)) return true;
+        if(name.equals(STRING_TYPE)) return true;
+        if(name.equals(BOOL_TYPE)) return true;
+        if(name.equals(INT_TYPE)) return true;
+        return false;
+    }
+    public static final boolean is_inheritable(String name){
+        if(name.equals(MAIN_TYPE)) return false;
+        if(name.equals(STRING_TYPE)) return false;
+        if(name.equals(BOOL_TYPE)) return false;
+        if(name.equals(INT_TYPE)) return false;
+        return true;
+    }
+    public static final boolean is_inheritable_standard(String name){
+      if(name.equals(ROOT_TYPE)) return true;
+      if(name.equals(IO_TYPE)) return true;
+      return false;
+    }
   }
 
   public static AST.class_ ROOT_CLASS = new AST.class_(Const.ROOT_TYPE, "", Const.ROOT_TYPE, getRootFeatures(), 0);
@@ -65,8 +98,15 @@ public class GlobalData{
     return featureList;
   }
 
+  // makes struct name for class
+  public static String makeStructName(String class){
+  	return "%class." + class;
+  }
+
   // ClassTable - maps class name to class parent
   public static HashMap<String, String> classTable;
+  // maps a class to a list of it's variables
+  // public static Hashmap<String, ArrayList<String>>
   // inheritance graph 
   public static InheritanceGraph inheritanceGraph;
   //Stores the IR
@@ -74,11 +114,26 @@ public class GlobalData{
   //Counter for register variables
   public static int Counter;
   // map from string constant to register
-  public static Map<String,int> strConsToRegister;
+  public static Map<String, int> strConsToRegister;
   //Counter for Global string registers.
   public static int strCounter;
   //Hashmap to store class size vs class name.
   public static HashMap<String,Integer> classNameToSize;
+  // given a class makes it's IR type or pointer
+  public static String makeClassTypeOrPointer(String cl) {
+    // same as getBasicType but the last one has an extra *
+    if("i64".equals(cl)) {
+        return "i64";
+    } else if("i1".equals(cl)) {
+        return "i1";
+    } else if(GlobalData.Const.STRING_TYPE.equals(cl)) {
+        return "i8*";
+    } else if(GlobalData.Const.INT_TYPE.equals(cl)) {
+        return "i32";
+    } else if(GlobalData.Const.BOOL_TYPE.equals(cl)) 
+        return "i8";
+    return makeStructName(cl) + "*";
+  }
   //Function to get the mangled name of a function.
   public static String mangledName(String classname, AST.method m)
   {
