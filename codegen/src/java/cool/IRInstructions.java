@@ -111,4 +111,17 @@ public class IRInstrucions{
     .append(alignment(type));
     GlobalData.out.println(builder.toString());
   }
+
+  //store instruction for double pointers
+  public static void addDPStoreInstruction(String type, String value, String addr){
+    type = GlobalData.structName(type);
+    int align = alignment(type);
+    type = type + "*";
+    StringBuilder builder = new StringBuilder("store ");
+    builder.append(type).append(" ").append(value).append(" , ")
+    .append(type).append("* ").append(addr).append(" , align ")
+    .append(align);
+    GlobalData.out.println(builder.toString());
+
+  }
 }
