@@ -5,7 +5,7 @@ public class Visitor{
 		GlobalData.inheritanceGraph = new inheritanceGraph(p);
 		for(AST.class_ cl: prog.classes) {
             if(!GlobalData.strConsToRegister.containsKey(cl.name)) {
-                GlobalData.strConsToRegister.put(cl.name, Global.strCounter);
+                GlobalData.strConsToRegister.put(cl.name, GlobalData.strCounter);
                 GlobalData.strCounter++;
             }
             GlobalData.inheritanceGraph.addClass(cl);
@@ -14,5 +14,7 @@ public class Visitor{
         Default.setDefaultClassSizes();
         GlobalData.addStringsAsGlobal();
         VisitorUtils.addStructsAllClasses();
+        VisitorUtils.visitAllClassesDFS(GlobalData.ROOT_CLASS);
+        
 	}
 }

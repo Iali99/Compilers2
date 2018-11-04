@@ -24,6 +24,7 @@ public class VisitorUtils{
             if(f instanceof AST.attr) {
                 AST.attr a = (AST.attr) f;	               
                 ir.append(", ").append(GlobalData.makeClassTypeOrPointer(a.typeid));
+            }
     	}
     	ir.append("}");
     	GlobalData.out.println(ir.toString());
@@ -31,4 +32,21 @@ public class VisitorUtils{
             addStructsAllClassesDFS(child);
         }
 	}
+
+	public static void visitAllClassesDFS(AST.class_ node){
+		GlobalData.scopeTable.enterScope();
+
+        // visit the class
+        if(!GlobalData.Const.isStandardClassName())
+            visit(node);
+
+        // iterate through all the child nodes
+        for(AST.class_ child: node.children) {
+            visitAllClassesDFS(child);
+        }
+
+        // exit scope
+        GlobalData.scopeTable.exitScope();
+    }
+
 }
