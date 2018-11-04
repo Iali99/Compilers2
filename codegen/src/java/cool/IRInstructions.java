@@ -43,7 +43,7 @@ public class IRInstrucions{
   //binary instruction based on arguments.
   public static String addBinaryInstruction(String operation,String type, String op1, String op2){
     StringBuilder builder = new StringBuilder("");
-    type = GlobalData.getTypeOrPtr(type);
+    type = GlobalData.makeClassTypeOrPointer(type);
     String retRegister = "%"+GlobalData.Counter;
     GlobalData.Counter++;
     builder.append(retRegister).append(" = ").append(operation).append(" nsw ")
@@ -114,7 +114,7 @@ public class IRInstrucions{
 
   //store instruction for double pointers
   public static void addDPStoreInstruction(String type, String value, String addr){
-    type = GlobalData.structName(type);
+    type = GlobalData.makeStructName(type);
     int align = alignment(type);
     type = type + "*";
     StringBuilder builder = new StringBuilder("store ");
@@ -137,9 +137,9 @@ public class IRInstrucions{
     String retRegister = "%"+GlobalData.Counter;
     GlobalData.Counter++;
     if(!isPrim(type1))
-      type1 = GlobalData.structName(type1) + "*";
+      type1 = GlobalData.makeStructName(type1) + "*";
     if(!isPrim(type2))
-      type2 = GlobalData.structName(type2) + "*";
+      type2 = GlobalData.makeStructName(type2) + "*";
     builder.append(retRegister).append(" = ").append(operation)
     .append(" ").append(type1).append(" ")
     .append(value).append(" to ").append(type2);
@@ -155,7 +155,7 @@ public class IRInstrucions{
     StringBuilder builder = new StringBuilder("");
     String retRegister = "%"+GlobalData.Counter;
     if(!isPrim(type))
-      type = GlobalData.structName(type1) + "*";
+      type = GlobalData.makeStructName(type1) + "*";
     builder.append(retRegister).append(" = icmp ").append(cond)
     .append(type).append(" ").append(op1).append(", ").append(op2);
     GlobalData.out.println(builder.toString());
@@ -166,7 +166,7 @@ public class IRInstrucions{
   public static String addCallInstruction(String type, String func, String args ){
     StringBuilder builder = new StringBuilder("call ");
     if(!type.equals("void"))
-      type = GlobalData.getTypeOrPtr(type);
+      type = GlobalData.makeClassTypeOrPointer(type);
     builder.append(type).append(" @").append(func).append("(")
     .append(args).append(")");
     String retRegister = "";
@@ -175,6 +175,6 @@ public class IRInstrucions{
       builder.insert(0,retRegister+" ")
     }
     GlobalData.out.println(builder.toString());
-    return retRegister;  
+    return retRegister;
   }
 }
