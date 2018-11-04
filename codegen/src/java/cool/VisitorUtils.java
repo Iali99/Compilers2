@@ -33,12 +33,59 @@ public class VisitorUtils{
         }
 	}
 
+	public void addParentConstructor(String parent, String cl){
+		
+	}
+
+	public void addConstructorAllClassesDFS(AST.class_ cl){
+		// make constructor for cl
+		StringBuilder ir = new StringBuilder("define void ");
+		// add mangled name for method
+		ir.append("@" + GlobalData.mangledName(cl.name, cl.name));
+		ir.append("(").append(GlobalData.makeStructName(cl.name)).append("* %this) {");
+		GlobalData.out.println(ir.toString());
+		GlobalData.out.println("entry:");
+		// add parent constructors
+		addParentConstructor(cl.parent, "%this");
+		// visit attributes
+		for(AST.feature f : cl.features) {
+            if(f instanceof AST.attr) {
+                AST.attr a = (AST.attr) f;	               
+                Visitor.visit(a);
+            }
+    	}
+		GlobalData.out.println("ret void ");
+		GlobalData.out.println("}");
+		GlobalData.out.println();
+		// make constructor for all other classes DFS
+		for(AST.class_ c : cl.children){
+			addConstructorAllClassesDFS(c);
+		}
+	}
+
+	public static void addConstructorAllClasses(){
+		// make constructor for ROOT
+		StringBuilder ir = new StringBuilder("define void ");
+		// add mangled name for method
+		ir.append("@" + GlobalData.mangledName(GlobalData.Const.ROOT_TYPE, GlobalData.Const.ROOT_TYPE));
+		ir.append("(").append(GlobalData.makeStructName(GlobalData.Const.ROOT_TYPE)).append("* %this) {");
+		GlobalData.out.println(ir.toString());
+		GlobalData.out.println("entry:");
+		GlobalData.out.println("ret void ");
+		GlobalData.out.println("}");
+		GlobalData.out.println();
+		// make constructor for all other classes DFS
+		for(AST.class_ cl : GlobalData.ROOT_CLASS.children){
+			addConstructorAllClassesDFS(cl);
+		}
+	}
+
 	public static void visitAllClassesDFS(AST.class_ node){
 		GlobalData.scopeTable.enterScope();
 
         // visit the class
         if(!GlobalData.Const.isStandardClassName())
-            visit(node);
+            visitMethods(node);
 
         // iterate through all the child nodes
         for(AST.class_ child: node.children) {

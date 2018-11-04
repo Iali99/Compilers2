@@ -117,6 +117,10 @@ public class GlobalData{
   public static Map<String, int> strConsToRegister;
   //Counter for Global string registers.
   public static int strCounter;
+  // variable name -> variable return type
+  public static ScopeTable<String> attrScopeTable;
+  // function name -> FunctionTypeMangledName
+  public static ScopeTable<String> methodScopeTable;
   //Hashmap to store class size vs class name.
   public static HashMap<String,Integer> classNameToSize;
   // given a class makes it's IR type or pointer
@@ -159,6 +163,8 @@ public class GlobalData{
   		strCounter = 0;
   		strConsToRegister = new Map<String, int>();
         classTable = new HashMap<String, String>();
+        attrScopeTable = new ScopeTable<String>();
+  		methodScopeTable = new ScopeTable<String>();
     }
 
 }
