@@ -10,5 +10,9 @@ public class Visitor{
             }
             GlobalData.inheritanceGraph.addClass(cl);
         }
+        Default.addDefaultStrings();
+        Default.setDefaultClassSizes();
+        GlobalData.addStringsAsGlobal();
+        
 	}
 }
