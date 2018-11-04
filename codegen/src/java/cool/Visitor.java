@@ -14,7 +14,26 @@ public class Visitor{
         Default.setDefaultClassSizes();
         GlobalData.addStringsAsGlobal();
         VisitorUtils.addStructsAllClasses();
+        VisitorUtils.addConstructorAllClasses();
         VisitorUtils.visitAllClassesDFS(GlobalData.ROOT_CLASS);
-        
 	}
+
+	// visit attribute
+	public static void visit(AST.attr at){
+		
+	}
+
+	// visits all methods of class
+	public void visitMethods(AST.class_ cl) {
+        for(AST.feature f : cl.features) {
+            if(f instanceof AST.method) {
+                visit((AST.method) f);
+            }
+        }
+    }
+
+    // visit for method
+    public void visit(AST.method m){
+
+    }
 }
