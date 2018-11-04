@@ -20,7 +20,10 @@ public class Visitor{
 
 	// visit attribute
 	public static void visit(AST.attr at){
-		
+		String gepRegister = IRPrinter.createClassAttrGEP(Global.currentClass, "%this", at.name);
+        String valueRegister = at.value.accept(this);
+        
+        
 	}
 
 	// visits all methods of class
@@ -34,6 +37,6 @@ public class Visitor{
 
     // visit for method
     public void visit(AST.method m){
-
+    	
     }
 }
