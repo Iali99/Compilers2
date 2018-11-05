@@ -119,5 +119,28 @@ public String visit(AST.loop e){
   builder.append("\nloopEnd"+Integer.toString(e.counter)+":");
   GlobalData.out.println(builder.toString());
   return retRegister;
+}
 
+public String visit(AST.cond e){
+  e.counter = ifCounter;
+  ifCounter++;
+  String pred = visit(e.predicate);
+  String retRegister = IRInstrucions.addAlloca(e.ifbody.type);
+  IRInstrucions.addBrInstruction(pred,"%ifBody"+Integer.toString(e.counter),"%elseBody"+Integer.toString(e.counter));
+  StringBuilder builder = new StringBuilder("\n");
+  builder.append("ifBody").append(e.counter).append(":");
+  GlobalData.out.println(builder.toString());
+  String ifReg = visit(e.ifbody);
+  IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(e.ifBody.type),ifReg,retRegister);
+  IRInstrucions.addBrInstruction("%ifEnd"+Integer.toString(e.counter));
+  builder.setLength(0);
+  builder.append("elseBody").append(e.counter).append(":");
+  GlobalData.out.println(builder.toString());
+  String elseReg = visit(e.ifbody);
+  IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(e.ifBody.type),elseReg,retRegister);
+  IRInstrucions.addBrInstruction("%ifEnd"+Integer.toString(e.counter));
+  builder.setLength(0);
+  builder.append("ifEnd").append(e.counter).append(":");
+  GlobalData.out.println(builder.toString());
+  return retRegister;
 }
