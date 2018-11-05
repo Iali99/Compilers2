@@ -44,7 +44,32 @@ public class Visitor{
 				IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(at.typeid), value, gep);
 			}
 			else{
-				
+				if(at.value.type.equals(at.typeid)){
+					IRInstructions.addDPStoreInstruction(at.typeid, value, gep);
+				}
+				else{
+					if(!GlobalData.Const.is_structable(at.value.type)){
+						// at.value to be casted to object
+						AST.new_ n = new AST.new_(Global.Constants.ROOT_TYPE, 0);
+                        n.type = GlobalData.Const.ROOT_TYPE;
+                        value = visit(newObj);
+                        // typename fixing
+                        String gep_ = IRInstructions.addGEPInstruction(GlobalData.Const.ROOT_TYPE, value, "");
+                        String value_ = IRInstructions.addGEPInstruction(at.value.type);
+                        IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(GlobalData.Const.STRING_TYPE), value_, gep_);
+						IRInstructions.addDPStoreInstruction(at.typeid, value, gep);
+					}
+					else{
+						String type1 = at.value.type;
+						String type2 = GlobalData.classTable.get(type1);
+						while(!type1.equals(at.typeid)){
+							value = IRInstructions.addConvertInstruction("bitcast", type1, type2, value);
+							type1 = type2;
+							type2 = GlobalData.classTable.get(type1);
+						}
+						IRInstructions.addDPStoreInstruction(at.typeid, value, gep);
+					}
+				}
 			}
 		}
 
