@@ -125,11 +125,18 @@ public String visit(AST.new_ e){
 
 public String visit(AST.assign e){
   String e1 = visit(e.e1);
-  // TODO: add the visit code.
-  if(!e.type.equals(e.e1.type)){
-    e1 = IRInstrucions.addConvertInstruction("bitcast",e.e1.type,e.type,e1);
+  String type = ;//TODO : get the type of variable from scopetable.
+  if(!type.equals(e.e1.type)){
+    e1 = IRInstrucions.addConvertInstruction("bitcast",e.e1.type,type,e1);
   }
-
+  if(/* check if the value is a parameter*/){
+    IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,GlobalData.makeAddressName(e.name));
+  }
+  else{
+    String addr = IRInstrucions.addGEPInstruction(Visitor.thisClass.name,"%this",e.name);
+    IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,addr);
+  }
+  return null;
 }
 
 public String visit(AST.block e){
