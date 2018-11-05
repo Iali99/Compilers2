@@ -15,7 +15,6 @@ public String visit(AST.int_const e){
   return Integer.toString(e.value);
 }
 
-//TODO : Add visit method for object
 public String visit(AST.object e){
   if(e.name.equals("self"))
     return "%this";
@@ -34,7 +33,7 @@ public String visit(AST.object e){
 
 public String visit(AST.comp e){
   String e1 = visit(e.e1);
-  //TODO : add instructions to comp
+  String retRegister = IRInstrucions.addBinaryInstruction("xor","bool",e1,"1");
 }
 
 public String visit(AST.eq e){
