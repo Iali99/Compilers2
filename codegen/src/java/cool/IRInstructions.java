@@ -153,10 +153,8 @@ public class IRInstrucions{
     StringBuilder builder = new StringBuilder("");
     String retRegister = "%"+GlobalData.Counter;
     GlobalData.Counter++;
-    if(!isPrim(type1))
-      type1 = GlobalData.makeStructName(type1) + "*";
-    if(!isPrim(type2))
-      type2 = GlobalData.makeStructName(type2) + "*";
+    type1 = GlobalData.makeClassTypeOrPointer(type1);
+    type2 = GlobalData.makeClassTypeOrPointer(type2);
     builder.append(retRegister).append(" = ").append(operation)
     .append(" ").append(type1).append(" ")
     .append(value).append(" to ").append(type2);

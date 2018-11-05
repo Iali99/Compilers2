@@ -126,6 +126,9 @@ public String visit(AST.new_ e){
 public String visit(AST.assign e){
   String e1 = visit(e.e1);
   // TODO: add the visit code.
+  if(!e.type.equals(e.e1.type)){
+    e1 = IRInstrucions.addConvertInstruction("bitcast",e.e1.type,e.type,e1);
+  }
 
 }
 
