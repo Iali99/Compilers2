@@ -99,6 +99,11 @@ public Strign visit(AST.plus e){
 }
 
 //TODO : add visit for isVoid expr
+public String visit(AST.isVoid e){
+  String e1 = visit(e.e1);
+  String retRegister = IRInstrucions.addIcmpInstruction("eq","i1",e1,"null");
+  return retRegister;
+}
 
 public String visit(AST.new_ e){
   //TODO : add visit for new_
