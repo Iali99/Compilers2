@@ -23,9 +23,30 @@ public class Visitor{
 
 	// visit attribute
 	public static void visit(AST.attr at){
-		String gepRegister = IRInstructions.addGEPInstruction(thisClass.name, "%this", at.name);
-        String valueRegister = at.value.accept(this);
-
+		String value = visit(at.value);
+		String gep = IRInstructions.addGEPInstruction(thisClass.name, "%this", at.name);
+        
+		if(value == null){
+			if(!GlobalData.Conts.is_structable(at.typeid)){
+				// is not structable hence, store default value
+				value = GlobalData.getDefaultValue(at.typeid);
+				IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(at.typeid), value, gep);
+			}
+			else{
+				// no assignment
+				value = "null";
+				IRInstructions.addDPStoreInstruction(at.typeid, value, gep);
+			}
+		}
+		else{
+			if(!GlobalData.Conts.is_structable(at.typeid)){
+				// simply store value
+				IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(at.typeid), value, gep);
+			}
+			else{
+				
+			}
+		}
 
 	}
 

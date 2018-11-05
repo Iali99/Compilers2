@@ -97,6 +97,18 @@ public class GlobalData{
 
     return featureList;
   }
+  // default values
+  public static String getDefaultValue(String type) {
+        if(GlobalData.Constants.INT_TYPE.equals(type)) {
+            return "0";
+        } else if(GlobalData.Constants.BOOL_TYPE.equals(type)) {
+            return "0";
+        } else if(GlobalData.Constants.STRING_TYPE.equals(type)) {
+            return IRInstructions.addGEPInstruction("");
+        } else {
+            return "undef";
+        }
+  }
 
   // makes struct name for class
   public static String makeStructName(String class){
