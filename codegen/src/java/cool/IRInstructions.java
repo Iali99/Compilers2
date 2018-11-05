@@ -89,19 +89,30 @@ public class IRInstrucions{
     return retRegister;
   }
 
-  public static String addGEPInstruction(String class, String value, String attr){
+  public static String addGEPInstruction(String cl, String value, String attr){
     StringBuilder builder = new StringBuilder("");
     String retRegister = "%" + GlobalData.Counter;
     builder.append(retRegister).append(" = getelementptr inbounds ")
-    .append(GlobalData.makeStructName(class)).append(", ")
-    .append(GlobalData.makeStructName(class)).append("* ")
-    .append(value).append(", i32 0, ");
+    .append(GlobalData.makeStructName(cl)).append(", ")
+    .append(GlobalData.makeStructName(cl)).append("* ")
+    .append(value).append(", i32 0");
     if(attr.equals("")){
-      builder.append("0");
+      builder.append(", 0");
     }
     else{
-      builder.append(//get attr index);
+	  // iterating through classes and checking if attr is contained or not
+	  	String it = cl;
+	  	while(!it.equals(GlobalData.Const.ROOT_TYPE)){
+      		if(GlobalData.attrIndexMap.containsKey(mangledName(it, attr))){
+      			builder.append(", i32 ").append(GlobalData.attrIndexMap.get(mangledName(it, attr)));
+      			break;
+    		}
+    		builder.append(", i32 0");
+    		// calling on parent of it
+    		it = GlobalData.classTable.get(it);
+  	  	}
     }
+    GlobalData.Counter++;
     GlobalData.out.println(builder.toString());
     return retRegister;
   }

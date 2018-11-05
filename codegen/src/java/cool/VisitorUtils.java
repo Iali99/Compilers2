@@ -41,6 +41,7 @@ public class VisitorUtils{
 	}
 
 	public void addConstructorAllClassesDFS(AST.class_ cl){
+		Visitor.thisClass = cl;
 		// make constructor for cl
 		StringBuilder ir = new StringBuilder("define void ");
 		// add mangled name for method
