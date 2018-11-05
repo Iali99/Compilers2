@@ -98,7 +98,6 @@ public Strign visit(AST.plus e){
   return retRegister;
 }
 
-//TODO : add visit for isVoid expr
 public String visit(AST.isVoid e){
   String e1 = visit(e.e1);
   String retRegister = IRInstrucions.addIcmpInstruction("eq","i1",e1,"null");
@@ -106,13 +105,38 @@ public String visit(AST.isVoid e){
 }
 
 public String visit(AST.new_ e){
-  //TODO : add visit for new_
+  String retRegister;
+  if(e.typeid.equals("int"))
+    return "0";
+  if(e.typeid.equals("bool"))
+    return "0";
+  if(e.typeid.equals("string")){
+    retRegister = IRInstrucions.addGEPInstruction("");
+    return retRegister;
+  }
+  retRegister = "%" + Integer.toString(GlobalData.Counter);
+  GlobalData.Counter++;
+  StringBuilder builder = new StringBuilder(retRegister);
+  builder.append(" = call noalias i8* @malloc(i64 ")
+  .append(GlobalData.classNameToSize(e.typeid)).append(" )");
+  GlobalData.out.println(builder.toString());
+  return retRegister;
 }
 
 public String visit(AST.assign e){
   String e1 = visit(e.e1);
-  // TODO: add the visit code.
-
+  String type = ;//TODO : get the type of variable from scopetable.
+  if(!type.equals(e.e1.type)){
+    e1 = IRInstrucions.addConvertInstruction("bitcast",e.e1.type,type,e1);
+  }
+  if(/* TODO : check if the value is a parameter*/){
+    IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,GlobalData.makeAddressName(e.name));
+  }
+  else{
+    String addr = IRInstrucions.addGEPInstruction(Visitor.thisClass.name,"%this",e.name);
+    IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,addr);
+  }
+  return null;
 }
 
 public String visit(AST.block e){
@@ -168,3 +192,21 @@ public String visit(AST.cond e){
 }
 
 //TODO : add visit for Static dispatch.
+public String visit(AST.static_dispatch e){
+  String caller = visit(caller);
+  //TODO : check void.
+  //TODO : check default funtions.
+
+  if(!e.caller.type.equals(e.typeid)){
+    caller = IRInstrucions.addConvertInstruction("bitcast",e.caller.type,e.typeid,caller)
+  }
+  StringBuilder args = new StringBuilder(GlobalData.makeClassTypeOrPointer(e.typeid));
+  args.append(" ").append(caller);
+  for(int i =0;i<e.actuals.size();i++){
+    String actual = visit(e.actual.get(i));
+    args.append(", ").append(GlobalData.makeClassTypeOrPointer(e.actuals.get(i).type))
+    .append(actual);
+  }
+  String retRegister = IRInstrucions.addCallInstruction(e.typeid,GlobalData.mangledName(e.name),args.toString());
+  return retRegister;
+}
