@@ -171,8 +171,8 @@ public class IRInstrucions{
   public static String addIcmpInstruction(String cond, String type, String op1, String op2){
     StringBuilder builder = new StringBuilder("");
     String retRegister = "%"+GlobalData.Counter;
-    if(!isPrim(type))
-      type = GlobalData.makeStructName(type1) + "*";
+    // if(!isPrim(type))
+    //   type = GlobalData.makeStructName(type1) + "*";
     builder.append(retRegister).append(" = icmp ").append(cond)
     .append(type).append(" ").append(op1).append(", ").append(op2);
     GlobalData.out.println(builder.toString());

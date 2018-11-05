@@ -98,7 +98,6 @@ public Strign visit(AST.plus e){
   return retRegister;
 }
 
-//TODO : add visit for isVoid expr
 public String visit(AST.isVoid e){
   String e1 = visit(e.e1);
   String retRegister = IRInstrucions.addIcmpInstruction("eq","i1",e1,"null");
@@ -106,7 +105,22 @@ public String visit(AST.isVoid e){
 }
 
 public String visit(AST.new_ e){
-  //TODO : add visit for new_
+  String retRegister;
+  if(e.typeid.equals("int"))
+    return "0";
+  if(e.typeid.equals("bool"))
+    return "0";
+  if(e.typeid.equals("string")){
+    retRegister = IRInstrucions.addGEPInstruction("");
+    return retRegister;
+  }
+  retRegister = "%" + Integer.toString(GlobalData.Counter);
+  GlobalData.Counter++;
+  StringBuilder builder = new StringBuilder(retRegister);
+  builder.append(" = call noalias i8* @malloc(i64 ")
+  .append(GlobalData.classNameToSize(e.typeid)).append(" )");
+  GlobalData.out.println(builder.toString());
+  return retRegister;
 }
 
 public String visit(AST.assign e){
