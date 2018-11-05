@@ -15,6 +15,7 @@ public class VisitorUtils{
 	}
 
 	public static void addStructsAllClassesDFS(AST_class_ cl){
+		int attrCounter = 1;
 		if(!GlobalData.Const.is_structable(cl.name))
         	return;
         StringBuilder ir = new StringBuilder();
@@ -22,7 +23,9 @@ public class VisitorUtils{
         ir.append(GlobalData.makeStructName(cl.parent));
         for(AST.feature f : cl.features) {
             if(f instanceof AST.attr) {
-                AST.attr a = (AST.attr) f;	               
+                AST.attr a = (AST.attr) f;
+                GlobalData.attrIndexMap.put(GlobalData.mangledName(cl.name, a.name), attrCounter);
+                attrCounter++;	               
                 ir.append(", ").append(GlobalData.makeClassTypeOrPointer(a.typeid));
             }
     	}
@@ -34,7 +37,7 @@ public class VisitorUtils{
 	}
 
 	public void addParentConstructor(String parent, String cl){
-		
+		// TODO     
 	}
 
 	public void addConstructorAllClassesDFS(AST.class_ cl){
@@ -42,7 +45,7 @@ public class VisitorUtils{
 		StringBuilder ir = new StringBuilder("define void ");
 		// add mangled name for method
 		ir.append("@" + GlobalData.mangledName(cl.name, cl.name));
-		ir.append("(").append(GlobalData.makeStructName(cl.name)).append("* %this) {");
+		ir.append("(").append(GlobalData.makeStructName(cl.name)).append("* %this){");
 		GlobalData.out.println(ir.toString());
 		GlobalData.out.println("entry:");
 		// add parent constructors
@@ -81,19 +84,13 @@ public class VisitorUtils{
 	}
 
 	public static void visitAllClassesDFS(AST.class_ node){
-		GlobalData.scopeTable.enterScope();
-
         // visit the class
         if(!GlobalData.Const.isStandardClassName())
             visitMethods(node);
-
         // iterate through all the child nodes
         for(AST.class_ child: node.children) {
             visitAllClassesDFS(child);
         }
-
-        // exit scope
-        GlobalData.scopeTable.exitScope();
     }
 
 }
