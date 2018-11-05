@@ -90,4 +90,17 @@ public String visit(AST.new_ e){
 public String visit(AST.assign e){
   String e1 = visit(e.e1);
   // TODO: add the visit code.
+
+}
+
+public String visit(AST.block e){
+  String retRegister;
+  for(int i =0;i<e.l1.size();i++){
+    retRegister = visit(e.l1.get(i));
+  }
+  return retRegister;
+}
+
+public String visit(AST.loop e){
+  
 }
