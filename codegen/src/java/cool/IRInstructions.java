@@ -75,7 +75,7 @@ public class IRInstrucions{
   }
 
   //getelementptr instruction
-  public static String addStrGEP(String str){
+  public static String addGEPInstruction(String str){
     if(!GlobalData.strConsToRegister.containsKey(str))
       return null;
     StringBuilder builder = new StringBuilder("");
@@ -85,6 +85,23 @@ public class IRInstrucions{
     .append(str.length()+1).append(" X i8], [").append(str.length()+1)
     .append(" X i8]* @globalstring").append(GlobalData.strConsToRegister.get(str))
     .append(" , i32 0 , i32 0");
+    GlobalData.out.println(builder.toString());
+    return retRegister;
+  }
+
+  public static String addGEPInstruction(String class, String value, String attr){
+    StringBuilder builder = new StringBuilder("");
+    String retRegister = "%" + GlobalData.Counter;
+    builder.append(retRegister).append(" = getelementptr inbounds ")
+    .append(GlobalData.makeStructName(class)).append(", ")
+    .append(GlobalData.makeStructName(class)).append("* ")
+    .append(value).append(", i32 0, ");
+    if(attr.equals("")){
+      builder.append("0");
+    }
+    else{
+      builder.append(//get attr index);
+    }
     GlobalData.out.println(builder.toString());
     return retRegister;
   }
