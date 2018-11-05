@@ -129,7 +129,7 @@ public String visit(AST.assign e){
   if(!type.equals(e.e1.type)){
     e1 = IRInstrucions.addConvertInstruction("bitcast",e.e1.type,type,e1);
   }
-  if(/* check if the value is a parameter*/){
+  if(/* TODO : check if the value is a parameter*/){
     IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,GlobalData.makeAddressName(e.name));
   }
   else{
@@ -192,3 +192,21 @@ public String visit(AST.cond e){
 }
 
 //TODO : add visit for Static dispatch.
+public String visit(AST.static_dispatch e){
+  String caller = visit(caller);
+  //TODO : check void.
+  //TODO : check default funtions.
+
+  if(!e.caller.type.equals(e.typeid)){
+    caller = IRInstrucions.addConvertInstruction("bitcast",e.caller.type,e.typeid,caller)
+  }
+  StringBuilder args = new StringBuilder(GlobalData.makeClassTypeOrPointer(e.typeid));
+  args.append(" ").append(caller);
+  for(int i =0;i<e.actuals.size();i++){
+    String actual = visit(e.actual.get(i));
+    args.append(", ").append(GlobalData.makeClassTypeOrPointer(e.actuals.get(i).type))
+    .append(actual);
+  }
+  String retRegister = IRInstrucions.addCallInstruction(e.typeid,GlobalData.mangledName(e.name),args.toString());
+  return retRegister;
+}
