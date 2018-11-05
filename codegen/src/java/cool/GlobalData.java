@@ -117,6 +117,8 @@ public class GlobalData{
   public static Map<String, int> strConsToRegister;
   //Counter for Global string registers.
   public static int strCounter;
+  // attribute mangled name with class to index map
+  public static Hashmap<String, int> attrIndexMap;
   // variable name -> variable return type
   public static ScopeTable<String> attrScopeTable;
   // function name -> FunctionTypeMangledName
@@ -175,6 +177,7 @@ public class GlobalData{
   }
   static {
   		strCounter = 0;
+  		attrIndexMap = new Hashmap<String, int>(); 
   		strConsToRegister = new Map<String, int>();
         classTable = new HashMap<String, String>();
         attrScopeTable = new ScopeTable<String>();
