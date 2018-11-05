@@ -43,7 +43,7 @@ public class Visitor{
     public void visit(AST.method m){
   		StringBuilder ir = new StringBuilder();
   		ir.append("define ").append(GlobalData.makeClassTypeOrPointer(m.typeid)).append(" ");
-  		ir.append("@").append(GlobalData.mangledNameWithClass(thisClass.name, m));
+  		ir.append("@").append(GlobalData.mangledName(thisClass.name, m));
   		ir.append("(").append(GlobalData.makeClassTypeOrPointer(thisClass.name)).append(" %this");
   		for(AST.formal f : m.formals){
   			ir.append(", ").append(GlobalData.makeClassTypeOrPointer(f.typeid)).append(" %").append(f.name);

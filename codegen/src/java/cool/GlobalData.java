@@ -143,55 +143,6 @@ public class GlobalData{
         return "i8";
     return makeStructName(cl) + "*";
   }
-  //get mangled name of a function with classname and parameters
-  public static String mangledNameWithClass(String classname, AST.method m)
-  {
-    StringBuilder mangledName = new StringBuilder();
-    mangledName.append(classname).append("$");
-    mangledName.append(m.name).append("$");
-    mangledName.append("_NP").append(m.formals.size()).append("$");
-    if(m.formals.size() != 0)
-    {
-      for(AST.formal f : m.formals)
-      {
-        mangledName.append(f.typeid).append("$");
-      }
-    }
-    return mangledName.toString();
-  }
-
-  //get mangled name without classname and with parameters and its type
-  public static String mangledNameWithType(AST.method m)
-  {
-    StringBuilder mangledName = new StringBuilder();
-    mangledName.append(m.typeid).append("$");
-    mangledName.append(m.name).append("$");
-    mangledName.append("_NP").append(m.formals.size()).append("$");
-    if(m.formals.size() != 0)
-    {
-      for(AST.formal f : m.formals)
-      {
-        mangledName.append(f.typeid).append("$");
-      }
-    }
-    return mangledName.toString();
-  }
-
-  public static String mangledNameWithExpr(String cl,String name,List<AST.expression> elist)
-  {
-    StringBuilder mangledName = new StringBuilder();
-    mangledName.append(cl).append("$");
-    mangledName.append(name).append("$");
-    mangledName.append("_NP").append(elist.size()).append("$");
-    if(elist.size() != 0)
-    {
-      for(AST.expression e : elist)
-      {
-        mangledName.append(e.type).append("$");
-      }
-    }
-    return mangledName.toString();
-  }
 
   //Function to get the mangled name of a function.
   public static String mangledName(String classname, AST.method m)
@@ -199,6 +150,14 @@ public class GlobalData{
     StringBuilder mangledName = new StringBuilder();
     mangledName.append(classname).append("$");
     mangledName.append(m.name).append("$");
+    return mangledName.toString();
+  }
+  //Function to get the mangled name of a function name.
+  public static String mangledName(String classname, String m)
+  {
+    StringBuilder mangledName = new StringBuilder();
+    mangledName.append(classname).append("$");
+    mangledName.append(m).append("$");
     return mangledName.toString();
   }
 

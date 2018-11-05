@@ -34,7 +34,7 @@ public class VisitorUtils{
 	}
 
 	public void addParentConstructor(String parent, String cl){
-		
+		// TODO     
 	}
 
 	public void addConstructorAllClassesDFS(AST.class_ cl){
@@ -42,7 +42,7 @@ public class VisitorUtils{
 		StringBuilder ir = new StringBuilder("define void ");
 		// add mangled name for method
 		ir.append("@" + GlobalData.mangledName(cl.name, cl.name));
-		ir.append("(").append(GlobalData.makeStructName(cl.name)).append("* %this) {");
+		ir.append("(").append(GlobalData.makeStructName(cl.name)).append("* %this){");
 		GlobalData.out.println(ir.toString());
 		GlobalData.out.println("entry:");
 		// add parent constructors
