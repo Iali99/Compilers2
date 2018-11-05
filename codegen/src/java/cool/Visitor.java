@@ -17,7 +17,7 @@ public class Visitor{
         GlobalData.addStringsAsGlobal();
         VisitorUtils.addStructsAllClasses();
         VisitorUtils.addConstructorAllClasses();
-        // TODO : generate all default methods
+        // visit methods of all classes including defaults
         VisitorUtils.visitAllClassesDFS(GlobalData.ROOT_CLASS);
 	}
 

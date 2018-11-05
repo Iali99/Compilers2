@@ -85,9 +85,8 @@ public class VisitorUtils{
 	}
 
 	public static void visitAllClassesDFS(AST.class_ node){
-        // visit the class
-        if(!GlobalData.Const.isStandardClassName())
-            visitMethods(node);
+        // visit the class including default types
+        Visitor.visitMethods(node);
         // iterate through all the child nodes
         for(AST.class_ child: node.children) {
             visitAllClassesDFS(child);
