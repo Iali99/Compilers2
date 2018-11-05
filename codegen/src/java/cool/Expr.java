@@ -16,6 +16,21 @@ public String visit(AST.int_const e){
 }
 
 //TODO : Add visit method for object
+public String visit(AST.object e){
+  if(e.name.equals("self"))
+    return "%this";
+  String retRegister;
+  if(isMethodParam(e.name)){
+    retRegister = IRInstrucions.addLoadInstruction(GlobalData.makeClassTypeOrPointer(e.type),GlobalData.makeAddressName(e.name));
+    return retRegister;
+  }
+  else{
+    String addr = IRInstrucions.addGEPInstruction(e.type,"%this",e.name);
+    retRegister = IRInstrucions.addLoadInstruction(GlobalData.makeClassTypeOrPointer(e.type),addr);
+    return retRegister;
+  }
+
+}
 
 public String visit(AST.comp e){
   String e1 = visit(e.e1);
@@ -144,3 +159,5 @@ public String visit(AST.cond e){
   GlobalData.out.println(builder.toString());
   return retRegister;
 }
+
+//TODO : add visit for Static dispatch.
