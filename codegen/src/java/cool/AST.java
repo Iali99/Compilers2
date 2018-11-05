@@ -244,6 +244,7 @@ public class AST{
 	public static class loop extends expression{
 		public expression predicate;
 		public expression body;
+		public int counter;
 		public loop(expression v1, expression v2, int l){
 			predicate = v1;
 			body = v2;

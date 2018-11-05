@@ -102,5 +102,22 @@ public String visit(AST.block e){
 }
 
 public String visit(AST.loop e){
-  
+  e.counter = loopCounter;
+  loopCounter++;
+  IRInstrucions.addBrInstruction("%loopCond"+Integer.toString(e.counter));
+  StringBuilder builder = new StringBuilder("\n");
+  builder.append("loopCond").append(e.counter).append(":\n");
+  GlobalData.out.println(builder.toString());
+  String pred = visit(e.predicate);
+  IRInstrucions.addBrInstruction(pred,"%loopBody"+Integer.toString(e.counter),"%loopEnd"+Integer.toString(e.counter));
+  builder.setLength(0);
+  builder.append("\nloopBody"+Integer.toString(e.counter)+":");
+  GlobalData.out.println(builder.toString());
+  String retRegister = visit(body);
+  IRInstrucions.addBrInstruction("%loopCond"+Integer.toString(e.counter));
+  builder.setLength(0);
+  builder.append("\nloopEnd"+Integer.toString(e.counter)+":");
+  GlobalData.out.println(builder.toString());
+  return retRegister;
+
 }
