@@ -68,8 +68,11 @@ public String visit(AST.neg e){
 public Strign visit(AST.divide e){
   String e1 = visit(e.e1);
   String e2 = visit(e.e2);
-
-  //TODO : add check for division by zero
+  String check = IRInstrucions.addIcmpInstruction("eq","i32",e2,"0");
+  IRInstrucions.addBrInstruction(check,"%divide0true","%divide0false");
+  StringBuilder builder = new StringBuilder("\n");
+  builder.append("divide0true :\n");
+  //TODO : add calls to error reporting functions.
   String retRegister = IRInstrucions.addBinaryInstruction("sdiv",e1.type,e1,e2);
   return retRegister;
 }
