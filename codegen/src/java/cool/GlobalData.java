@@ -113,6 +113,8 @@ public class GlobalData{
   public static PrintWriter out;
   //Counter for register variables
   public static int Counter;
+  // counter for loop
+  public static int loopCounter;
   // map from string constant to register
   public static Map<String, int> strConsToRegister;
   //Counter for Global string registers.
@@ -177,6 +179,7 @@ public class GlobalData{
   }
   static {
   		strCounter = 0;
+  		loopCounter = 0;
   		attrIndexMap = new Hashmap<String, int>(); 
   		strConsToRegister = new Map<String, int>();
         classTable = new HashMap<String, String>();

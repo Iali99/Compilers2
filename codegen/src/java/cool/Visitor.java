@@ -1,7 +1,7 @@
 package cool;
 import java.util.*;
 public class Visitor{
-	public AST.class_ thisClass;
+	public static AST.class_ thisClass;
 
 	public void visit(AST.program p){
 		GlobalData.inheritanceGraph = new inheritanceGraph(p);
@@ -23,7 +23,7 @@ public class Visitor{
 
 	// visit attribute
 	public static void visit(AST.attr at){
-		String gepRegister = IRPrinter.createClassAttrGEP(Global.currentClass, "%this", at.name);
+		String gepRegister = IRInstructions.addGEPInstruction(thisClass.name, "%this", at.name);
         String valueRegister = at.value.accept(this);
 
 
@@ -41,6 +41,7 @@ public class Visitor{
 
     // visit for method
     public void visit(AST.method m){
+    	GlobalData.loopCounter = 0;
   		StringBuilder ir = new StringBuilder();
   		ir.append("define ").append(GlobalData.makeClassTypeOrPointer(m.typeid)).append(" ");
   		ir.append("@").append(GlobalData.mangledName(thisClass.name, m));
