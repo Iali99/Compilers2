@@ -1,3 +1,4 @@
+
 package cool;
 import java.util.*;
 public class InheritanceGraph implements InheritanceGraphInterface{
@@ -21,7 +22,7 @@ public class InheritanceGraph implements InheritanceGraphInterface{
     GlobalData.classTable.put(GlobalData.Const.BOOL_TYPE, GlobalData.Const.ROOT_TYPE);
     GlobalData.classTable.put(GlobalData.Const.STRING_TYPE, GlobalData.Const.ROOT_TYPE);
     checkGraph();
-		setChildren();
+    setChildren();
   }
 
   public AST.class_ getRootClass(){
@@ -70,28 +71,28 @@ public class InheritanceGraph implements InheritanceGraphInterface{
   public void checkGraph(){
     List<AST.class_> classes = p.classes;
 
-		// go to each class and add it to classTable
-		for(AST.class_ iter : classes){
+    // go to each class and add it to classTable
+    for(AST.class_ iter : classes){
       if(GlobalData.Const.is_standard_class_name(iter.name)){
         Semantic.reportError(GlobalData.filename, iter.lineNo, "standard class cannot be redefined : "+iter.name);
       }
-			else if(GlobalData.classTable.containsKey(iter.name)){
-				Semantic.reportError(GlobalData.filename, iter.lineNo, "class redefined : " + iter.name);
-			}
-			else
-				GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
-		}
+      else if(GlobalData.classTable.containsKey(iter.name)){
+        Semantic.reportError(GlobalData.filename, iter.lineNo, "class redefined : " + iter.name);
+      }
+      else
+        GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
+    }
 
-		// iterate over each class and check for cycles
-		for(AST.class_ iter : classes){
-			String parent = iter.parent;
+    // iterate over each class and check for cycles
+    for(AST.class_ iter : classes){
+      String parent = iter.parent;
 
-			if(parent.equals(GlobalData.Const.ROOT_TYPE)){
-				continue;
-			}
-			// check existence of parent
-			if(!GlobalData.classTable.containsKey(parent)){
-			  Semantic.reportError(GlobalData.filename, iter.lineNo, "class does not exist : " + parent);
+      if(parent.equals(GlobalData.Const.ROOT_TYPE)){
+        continue;
+      }
+      // check existence of parent
+      if(!GlobalData.classTable.containsKey(parent)){
+        Semantic.reportError(GlobalData.filename, iter.lineNo, "class does not exist : " + parent);
         // if parent is not inheritable is_standard then recover
         if(!GlobalData.Const.is_inheritable_standard(parent)){
           // recover
@@ -104,20 +105,20 @@ public class InheritanceGraph implements InheritanceGraphInterface{
         iter.parent = GlobalData.Const.ROOT_TYPE;
         GlobalData.classTable.put(iter.name, GlobalData.Const.ROOT_TYPE);
       }
-			else{
-				// check for loops
-				String grandparent = GlobalData.classTable.get(parent);
-				while(!grandparent.equals(GlobalData.Const.ROOT_TYPE)){
-					// check for cycles
-					if(grandparent.equals(iter.name)){
-						Semantic.reportError(GlobalData.filename, iter.lineNo, "cycle detected : "+iter.name);
-						System.exit(1);
-					}
-					grandparent = GlobalData.classTable.get(grandparent);
-				}
-				GlobalData.classTable.put(iter.name, parent);
-			}
-		}
+      else{
+        // check for loops
+        String grandparent = GlobalData.classTable.get(parent);
+        while(!grandparent.equals(GlobalData.Const.ROOT_TYPE)){
+          // check for cycles
+          if(grandparent.equals(iter.name)){
+            Semantic.reportError(GlobalData.filename, iter.lineNo, "cycle detected : "+iter.name);
+            System.exit(1);
+          }
+          grandparent = GlobalData.classTable.get(grandparent);
+        }
+        GlobalData.classTable.put(iter.name, parent);
+      }
+    }
   }
 
   //function to check if a class exists in the inheritance graph.
