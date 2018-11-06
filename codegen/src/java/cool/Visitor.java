@@ -91,8 +91,9 @@ public class Visitor{
     // visit for method
     public void visit(AST.method m){
     	GlobalData.attrScopeTable.enterScope();
-		thisMethod = m;
+		  thisMethod = m;
     	GlobalData.loopCounter = 0;
+			GLobalData.ifCounter = 0;
   		StringBuilder ir = new StringBuilder();
   		ir.append("define ").append(GlobalData.makeClassTypeOrPointer(m.typeid)).append(" ");
   		ir.append("@").append(GlobalData.mangledName(thisClass.name, m));
