@@ -24,7 +24,7 @@ public class Visitor{
 	}
 
 	// visit attribute
-	public static void visit(AST.attr at){
+	public void visit(AST.attr at){
 		String value = visit(at.value);
 		String gep = IRInstructions.addGEPInstruction(thisClass.name, "%this", at.name);
 
@@ -274,7 +274,7 @@ public class Visitor{
 		}
 
 		public String visit(AST.block e){
-		  String retRegister;
+		  String retRegister = null;
 		  for(int i =0;i<e.l1.size();i++){
 		    retRegister = visit(e.l1.get(i));
 		  }

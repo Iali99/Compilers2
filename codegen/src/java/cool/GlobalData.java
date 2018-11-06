@@ -201,7 +201,7 @@ public class GlobalData{
     while (it.hasNext()) {
         Map.Entry pair = (Map.Entry)it.next();
         ir.append("@globalstring").append(pair.getValue())
-        .append(" = private unnamed_addr constant [").append((pair.getKey()).length() + 1)
+        .append(" = private unnamed_addr constant [").append(pair.getKey().toString().length() + 1)
         .append(" x i8] c\"").append(pair.getKey()).append("\\00\", align 1\n");
     }
     GlobalData.out.println(ir.toString());

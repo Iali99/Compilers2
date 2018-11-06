@@ -10,6 +10,7 @@ public class ScopeTable<T> {
 	void insert(String s, T t){
 		maps.get(scope).put(s,t);
 	}
+	
 	void enterScope(){
 		scope++;
 		maps.add(new HashMap<String, T>());
@@ -19,7 +20,7 @@ public class ScopeTable<T> {
 			maps.remove(scope);
 			scope--;
 		}
-	}	
+	}
 	T lookUpLocal(String t){
 		return maps.get(scope).get(t);
 	}
