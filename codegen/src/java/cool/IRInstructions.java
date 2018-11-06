@@ -59,7 +59,10 @@ public class IRInstrucions{
     StringBuilder builder = new StringBuilder("");
     String retRegister = "%"+GlobalData.Counter;
     GlobalData.Counter++;
-    type = getType(type);
+    type = GlobalData.makeClassTypeOrPointer(type);
+    if(!isPrim(type)){
+      type = type.substring(0,type.length()-1);
+    }
     builder.append(retRegister).append(" = alloca ").append(type).append(" , align 8");
     GlobalData.out.println(builder.toString());
     return retRegister;
@@ -202,5 +205,21 @@ public class IRInstrucions{
     }
     GlobalData.out.println(builder.toString());
     return retRegister;
+  }
+
+  //add label for division by 0 error
+  public static void add0ErrorLabel(){
+    StringBuilder builder = new StringBuilder("divide0true:\n");
+    builder.append("call void @reportError0()\n")
+    .append("call void @exit(i32 1)\n");
+    GlobalData.out.println(builder.toString());
+  }
+
+  //add label for dispatch on void error
+  public static void addVoidErrorLabel(){
+    StringBuilder builder = new StringBuilder("voidTrue:\n");
+    builder.append("call void @reportErrorVoid()\n")
+    .append("call void @exit(i32 1)\n");
+    GlobalData.out.println(builder.toString());
   }
 }

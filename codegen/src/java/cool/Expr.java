@@ -71,8 +71,7 @@ public Strign visit(AST.divide e){
   String check = IRInstrucions.addIcmpInstruction("eq","i32",e2,"0");
   IRInstrucions.addBrInstruction(check,"%divide0true","%divide0false");
   StringBuilder builder = new StringBuilder("\n");
-  builder.append("divide0true :\n");
-  //TODO : add calls to error reporting functions.
+  builder.append("divide0false :\n");
   String retRegister = IRInstrucions.addBinaryInstruction("sdiv",e1.type,e1,e2);
   return retRegister;
 }
@@ -192,10 +191,16 @@ public String visit(AST.cond e){
 }
 
 public String visit(AST.static_dispatch e){
-  String caller = visit(caller);
-  //TODO : check void.
-  //TODO : check default funtions.
-
+  String caller = visit(e.caller);
+  String alloca = IRInstrucions.addAlloca(e.caller.type);
+  String type = GlobalData.makeClassTypeOrPointer(e.caller.type);
+  if(!isPrim(type)){
+    type = type.substring(0,type.length()-1);
+  }
+  IRInstrucions.addStoreInstruction(type,caller,alloca);
+  String comp = IRInstrucions.addIcmpInstruction("eq",GLobalData.makeClassTypeOrPointer(e.caller.type),alloca,"null");
+  IRInstrucions.addBrInstruction(comp,"%voidTrue","%voidFalse");
+  GLobalData.out.println("voidFalse :");
   if(!e.caller.type.equals(e.typeid)){
     caller = IRInstrucions.addConvertInstruction("bitcast",e.caller.type,e.typeid,caller)
   }
