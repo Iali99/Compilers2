@@ -70,8 +70,8 @@ public Strign visit(AST.divide e){
   String e2 = visit(e.e2);
   String check = IRInstrucions.addIcmpInstruction("eq","i32",e2,"0");
   IRInstrucions.addBrInstruction(check,"%divide0true","%divide0false");
-  StringBuilder builder = new StringBuilder("\n");
-  builder.append("divide0false :\n");
+  StringBuilder ir = new StringBuilder("\n");
+  ir.append("divide0false :\n");
   String retRegister = IRInstrucions.addBinaryInstruction("sdiv",e1.type,e1,e2);
   return retRegister;
 }
@@ -115,10 +115,10 @@ public String visit(AST.new_ e){
   }
   retRegister = "%" + Integer.toString(GlobalData.Counter);
   GlobalData.Counter++;
-  StringBuilder builder = new StringBuilder(retRegister);
-  builder.append(" = call noalias i8* @malloc(i64 ")
+  StringBuilder ir = new StringBuilder(retRegister);
+  ir.append(" = call noalias i8* @malloc(i64 ")
   .append(GlobalData.classNameToSize(e.typeid)).append(" )");
-  GlobalData.out.println(builder.toString());
+  GlobalData.out.println(ir.toString());
   return retRegister;
 }
 
@@ -150,19 +150,19 @@ public String visit(AST.loop e){
   e.counter = loopCounter;
   loopCounter++;
   IRInstrucions.addBrInstruction("%loopCond"+Integer.toString(e.counter));
-  StringBuilder builder = new StringBuilder("\n");
-  builder.append("loopCond").append(e.counter).append(":\n");
-  GlobalData.out.println(builder.toString());
+  StringBuilder ir = new StringBuilder("\n");
+  ir.append("loopCond").append(e.counter).append(":\n");
+  GlobalData.out.println(ir.toString());
   String pred = visit(e.predicate);
   IRInstrucions.addBrInstruction(pred,"%loopBody"+Integer.toString(e.counter),"%loopEnd"+Integer.toString(e.counter));
-  builder.setLength(0);
-  builder.append("\nloopBody"+Integer.toString(e.counter)+":");
-  GlobalData.out.println(builder.toString());
+  ir.setLength(0);
+  ir.append("\nloopBody"+Integer.toString(e.counter)+":");
+  GlobalData.out.println(ir.toString());
   String retRegister = visit(body);
   IRInstrucions.addBrInstruction("%loopCond"+Integer.toString(e.counter));
-  builder.setLength(0);
-  builder.append("\nloopEnd"+Integer.toString(e.counter)+":");
-  GlobalData.out.println(builder.toString());
+  ir.setLength(0);
+  ir.append("\nloopEnd"+Integer.toString(e.counter)+":");
+  GlobalData.out.println(ir.toString());
   return retRegister;
 }
 
@@ -172,21 +172,21 @@ public String visit(AST.cond e){
   String pred = visit(e.predicate);
   String retRegister = IRInstrucions.addAlloca(e.ifbody.type);
   IRInstrucions.addBrInstruction(pred,"%ifBody"+Integer.toString(e.counter),"%elseBody"+Integer.toString(e.counter));
-  StringBuilder builder = new StringBuilder("\n");
-  builder.append("ifBody").append(e.counter).append(":");
-  GlobalData.out.println(builder.toString());
+  StringBuilder ir = new StringBuilder("\n");
+  ir.append("ifBody").append(e.counter).append(":");
+  GlobalData.out.println(ir.toString());
   String ifReg = visit(e.ifbody);
   IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(e.ifBody.type),ifReg,retRegister);
   IRInstrucions.addBrInstruction("%ifEnd"+Integer.toString(e.counter));
-  builder.setLength(0);
-  builder.append("elseBody").append(e.counter).append(":");
-  GlobalData.out.println(builder.toString());
+  ir.setLength(0);
+  ir.append("elseBody").append(e.counter).append(":");
+  GlobalData.out.println(ir.toString());
   String elseReg = visit(e.ifbody);
   IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(e.ifBody.type),elseReg,retRegister);
   IRInstrucions.addBrInstruction("%ifEnd"+Integer.toString(e.counter));
-  builder.setLength(0);
-  builder.append("ifEnd").append(e.counter).append(":");
-  GlobalData.out.println(builder.toString());
+  ir.setLength(0);
+  ir.append("ifEnd").append(e.counter).append(":");
+  GlobalData.out.println(ir.toString());
   return retRegister;
 }
 

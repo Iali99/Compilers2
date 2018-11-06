@@ -13,12 +13,13 @@ public class Visitor{
             GlobalData.inheritanceGraph.addClass(cl);
         }
         Default.addDefaultStrings();
+				Default.addCdecls();
         Default.setDefaultClassSizes();
-        GlobalData.addStringsAsGlobal();
         VisitorUtils.addStructsAllClasses();
         VisitorUtils.addConstructorAllClasses();
         Default.visitDefaultMethods();
         VisitorUtils.visitAllClassesDFS(GlobalData.ROOT_CLASS);
+				GlobalData.addStringsAsGlobal();
 	}
 
 	// visit attribute
