@@ -35,10 +35,6 @@ public class VisitorUtils{
         }
 	}
 
-	public void addParentConstructor(String parent, String cl){
-		// TODO     
-	}
-
 	public void addConstructorAllClassesDFS(AST.class_ cl){
 		Visitor.thisClass = cl;
 		// make constructor for cl
@@ -49,7 +45,10 @@ public class VisitorUtils{
 		GlobalData.out.println(ir.toString());
 		GlobalData.out.println("entry:");
 		// add parent constructors
-		addParentConstructor(cl.parent, "%this");
+        if(cl.parent!=null) {
+            String regNew = IRInstructions.addConvertInstruction("bitcast", Global.currentClass, cl.parent, "%this");
+            IRInstructions.callConstructorInstruction(cl.parent, regNew);
+        }
 		// visit attributes
 		for(AST.feature f : cl.features) {
             if(f instanceof AST.attr) {
