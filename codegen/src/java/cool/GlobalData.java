@@ -8,10 +8,10 @@ public class GlobalData{
 	public static final String BOOL_TYPE = "Bool";
 	public static final String STRING_TYPE = "String";
 	public static final String MAIN_TYPE = "Main";
-	public static final String ZERO_ERROR = "\nDivide by 0 exception at line no ";
-    public static final String ZERO_FUNCTION = "print_div_by_zero_err_msg";
-    public static final String VOID_ERROR = "\nDispatch to void at line no ";
-    public static final String VOID_FUNCTION = "print_dispatch_on_void_error";
+	public static final String ZERO_ERROR = "\nError : Division by 0 is not permissible";
+    public static final String ZERO_FUNCTION = "reportError0";
+    public static final String VOID_ERROR = "\nError : Dispatch on void is not permissible";
+    public static final String VOID_FUNCTION = "reportErrorVoid";
     public static final String ABORT = "\nAbort called from class ";
 	public static final boolean is_structable(String name){
 		if(name.equals(INT_TYPE)) return false;

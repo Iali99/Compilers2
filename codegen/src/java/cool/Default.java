@@ -118,6 +118,33 @@ public class Default{
     GlobalData.out.println("ret i8* %1")
     GlobalData.out.println("}")
     GlobalData.out.println();
+
+    //method to report divide by 0 error
+    GlobalData.out.println("define void @reportError0(){");
+    GlobalData.out.println("entry:");
+    String error = IRInstrucions.addGEPInstruction(GLobalData.Const.ZERO_ERROR);
+    String s = IRInstrucions.addGEPInstruction("%s");
+    %2 = call i32 (i8*, ...) @printf(i8* %0, i8* %1)
+    GLobalData.out.print("%r = call i32 (i8*, ...) @printf(i8* ");
+    GlobalData.out.print(s);
+    GlobalData.out.print(", i8* ");
+    GlobalData.out.print(error);
+    GlobalData.out.println(")\nret void\n}");
+    GlobalData.out.println();
+
+    //method to report dispatch on void error
+    GlobalData.out.println("define void @reportErrorVoid(){");
+    GlobalData.out.println("entry:");
+    String error = IRInstrucions.addGEPInstruction(GLobalData.Const.VOID_ERROR);
+    String s = IRInstrucions.addGEPInstruction("%s");
+    %2 = call i32 (i8*, ...) @printf(i8* %0, i8* %1)
+    GLobalData.out.print("%r = call i32 (i8*, ...) @printf(i8* ");
+    GlobalData.out.print(s);
+    GlobalData.out.print(", i8* ");
+    GlobalData.out.print(error);
+    GlobalData.out.println(")\nret void\n}");
+    GlobalData.out.println();
+
   }
 
   public static void addDefaultStrings(){
@@ -173,16 +200,8 @@ public class Default{
       GlobalData.strConsToRegister.put(GLobalData.Const.ZERO_ERROR, GlobalData.strCounter);
       GlobalData.strCounter++;
     }
-    if(!GlobalData.strConsToRegister.containsKey(GLobalData.Const.ZERO_FUNCTION)){
-      GlobalData.strConsToRegister.put(GLobalData.Const.ZERO_FUNCTION, GlobalData.strCounter);
-      GlobalData.strCounter++;
-    }
     if(!GlobalData.strConsToRegister.containsKey(GLobalData.Const.VOID_ERROR)){
       GlobalData.strConsToRegister.put(GLobalData.Const.VOID_ERROR, GlobalData.strCounter);
-      GlobalData.strCounter++;
-    }
-    if(!GlobalData.strConsToRegister.containsKey(GLobalData.Const.VOID_FUNCTION)){
-      GlobalData.strConsToRegister.put(GLobalData.Const.VOID_FUNCTION, GlobalData.strCounter);
       GlobalData.strCounter++;
     }
     if(!GlobalData.strConsToRegister.containsKey(GLobalData.Const.ABORT)){
