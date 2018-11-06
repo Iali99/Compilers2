@@ -1,28 +1,19 @@
-(* Type of initialization expression in let conform to the declared type of the identifier *)
+(* Illustrates bool expressions *)
+
 class A {
-    a : Int;
-};
-
-class B inherits A {
-    b : Int;
-};
-
-class C inherits B {
-    c : Int;
-};
-
-class D {
-    d : Int;
-};
-
-class E {
-    a : A <- new A;
-    b : B <- new B;
-    c : C <- new C;
-    d : D <- new D;
-    f1() : Int {
-        let x : A <- c, y : B <- b, z : B <- c, w : D <- d in 
+    f1(x : Bool, y : String) : Int {
         {
+            if x then 0 else 1 fi;
+            0;
+        }
+    };
+};
+
+class B {
+    f2(x : Bool, y : Bool, z : Int) : Int {
+        {
+            while x loop z <- z+1 pool;
+            while y loop z <- z+1 pool;
             0;
         }
     };

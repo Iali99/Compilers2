@@ -17,9 +17,9 @@ public class Visitor{
 				Default.addCdecls();
         Default.setDefaultClassSizes();
         VisitorUtils.addStructsAllClasses();
-        VisitorUtils.addConstructorAllClasses();
-        Default.visitDefaultMethods();
         VisitorUtils.visitAllClassesDFS(GlobalData.ROOT_CLASS);
+				VisitorUtils.addConstructorAllClasses();
+				Default.visitDefaultMethods();
 				GlobalData.addStringsAsGlobal();
 	}
 
@@ -94,6 +94,7 @@ public class Visitor{
     public static void visit(AST.method m){
     	GlobalData.attrScopeTable.enterScope();
 		  thisMethod = m;
+			GlobalData.Counter = 0;
     	GlobalData.loopCounter = 0;
 			GlobalData.ifCounter = 0;
   		StringBuilder ir = new StringBuilder();
@@ -119,9 +120,10 @@ public class Visitor{
   			IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(f.typeid), "%"+f.name, GlobalData.makeAddressName(f.name));
   		}
   		String ret = visit(m.body);
+
   		// bit casting if type mismatch
   		if(!m.typeid.equals(m.body.type)){
-  			ret = IRInstructions.addConvertInstruction("bitcast", m.body.type, m.typeid, ret);
+  			  			ret = IRInstructions.addConvertInstruction("bitcast", m.body.type, m.typeid, ret);
   		}
   		GlobalData.out.println("ret " + GlobalData.makeClassTypeOrPointer(m.typeid) + " " + ret);
   		GlobalData.out.println("}");
@@ -129,6 +131,9 @@ public class Visitor{
     	GlobalData.attrScopeTable.exitScope();
     }
 
+	public static String visit(AST.no_expr e){
+		return "";
+	}
 	public static String visit(AST.bool_const e){
 	  if(e.value == true)
 	    return "1";
@@ -205,9 +210,8 @@ public class Visitor{
 	  String e1 = visit(e.e1);
 	  String e2 = visit(e.e2);
 	  String check = IRInstructions.addIcmpInstruction("eq","i32",e2,"0");
-	  IRInstructions.addBrInstruction(check,"%divide0true","%divide0false");
-	  StringBuilder ir = new StringBuilder("\n");
-	  ir.append("divide0false :\n");
+	  IRInstructions.addBrInstruction(check,"%divide0true","%divide0false"+GlobalData.ifCounter);
+	  GlobalData.out.println("divide0false"+GlobalData.ifCounter+" : ");
 	  String retRegister = IRInstructions.addBinaryInstruction("sdiv",e.e1.type,e1,e2);
 	  return retRegister;
 	}
@@ -260,7 +264,8 @@ public class Visitor{
 
 	public static String visit(AST.assign e){
 	  String e1 = visit(e.e1);
-	  String type = GlobalData.attrScopeTable.lookUpLocal(e.name);
+		String retRegister = e1;
+	  String type = GlobalData.attrScopeTable.lookUpGlobal(e.name);
 	  if(!type.equals(e.e1.type)){
 	    e1 = IRInstructions.addConvertInstruction("bitcast",e.e1.type,type,e1);
 	  }
@@ -271,11 +276,11 @@ public class Visitor{
 	    String addr = IRInstructions.addGEPInstruction(Visitor.thisClass.name,"%this",e.name);
 	    IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,addr);
 	  }
-	  return null;
+	  return retRegister;
 	}
 
 		public static String visit(AST.block e){
-		  String retRegister = null;
+		  String retRegister = "";
 		  for(int i =0;i<e.l1.size();i++){
 		    retRegister = visit(e.l1.get(i));
 		  }
@@ -335,8 +340,9 @@ public class Visitor{
 	  }
 	  IRInstructions.addStoreInstruction(type,caller,alloca);
 	  String comp = IRInstructions.addIcmpInstruction("eq",GlobalData.makeClassTypeOrPointer(e.caller.type),alloca,"null");
-	  IRInstructions.addBrInstruction(comp,"%voidTrue","%voidFalse");
-	  GlobalData.out.println("voidFalse :");
+	  IRInstructions.addBrInstruction(comp,"%voidTrue","%voidFalse"+GlobalData.ifCounter);
+	  GlobalData.out.println("voidFalse"+GlobalData.ifCounter+" :");
+		GlobalData.ifCounter++;
 	  if(!e.caller.type.equals(e.typeid)){
 	    caller = IRInstructions.addConvertInstruction("bitcast",e.caller.type,e.typeid,caller);
 	  }
@@ -352,7 +358,6 @@ public class Visitor{
 	}
 
 	public static String visit(AST.expression e){
-		if(e == null) return null;
 		if(e instanceof AST.no_expr)
 				return visit((AST.no_expr)e);
 		if(e instanceof AST.bool_const)

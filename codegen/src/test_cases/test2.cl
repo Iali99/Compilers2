@@ -1,5 +1,4 @@
-(* Rules for conditionals, including working of joins *)
-
+(* Type of initialization expression in let conform to the declared type of the identifier *)
 class A {
     a : Int;
 };
@@ -8,42 +7,24 @@ class B inherits A {
     b : Int;
 };
 
-class C {
+class C inherits B {
     c : Int;
 };
 
 class D {
-    a : A;
-    b : B;
-    c : C;
     d : Int;
-    e : Int; 
-    f : Bool;
+};
+
+class E {
+    a : A <- new A;
+    b : B <- new B;
+    c : C <- new C;
+    d : D <- new D;
     f1() : Int {
+        let x : A <- c, y : B <- b, z : B <- c, w : D <- d in 
         {
-            if d = e then a else b fi;
-            if f then a else c fi;
-            if f then d else e fi;
-            if d = e then e else f fi;
             0;
         }
-    };
-};
-
-class E inherits B {
-    e : Int;
-};
-
-class F inherits B {
-    f : Int;
-};
-
-class G {
-    e : E;
-    f : F;
-    a : Bool;
-    f1() : B {
-        if a then e else f fi
     };
 };
 

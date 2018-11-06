@@ -30,7 +30,7 @@ declare i8* @strncpy(i8*, i8*, i32)
 ; Struct declarations
 %class.Object = type {i8*}
 %class.IO = type { %class.Object}
-%class.Main = type { %class.Object, i32}
+%class.Main = type { %class.Object}
 
 define i32 @Main$main$(%class.Main* %this){
 
@@ -45,9 +45,7 @@ call void @exit(i32 1)
 
 
 entry:
-%0 = getelementptr inbounds %class.Int, %class.Int* %this, i32 0, i32 0
-%1 = load i32 , i32* %0 , align 4
-ret i32 %1
+ret i32 0
 }
 
 define void @Object$Object$(%class.Object* %this) {
@@ -57,38 +55,36 @@ ret void
 
 define void @Bool$Bool$(%class.Bool* %this){
 entry:
-%2 = bitcast i8 %this to %class.Object*
-call void @Object$Object$(%class.Object* %2)
+%0 = bitcast i8 %this to %class.Object*
+call void @Object$Object$(%class.Object* %0)
 ret void 
 }
 
 define void @IO$IO$(%class.IO* %this){
 entry:
-%3 = bitcast %class.IO* %this to %class.Object*
-call void @Object$Object$(%class.Object* %3)
+%1 = bitcast %class.IO* %this to %class.Object*
+call void @Object$Object$(%class.Object* %1)
 ret void 
 }
 
 define void @String$String$(%class.String* %this){
 entry:
-%4 = bitcast i8* %this to %class.Object*
-call void @Object$Object$(%class.Object* %4)
+%2 = bitcast i8* %this to %class.Object*
+call void @Object$Object$(%class.Object* %2)
 ret void 
 }
 
 define void @Main$Main$(%class.Main* %this){
 entry:
-%5 = bitcast %class.Main* %this to %class.Object*
-call void @Object$Object$(%class.Object* %5)
-%6 = getelementptr inbounds %class.Main, %class.Main* %this, i32 0, i32 1
-store i32  , i32* %6 , align 4
+%3 = bitcast %class.Main* %this to %class.Object*
+call void @Object$Object$(%class.Object* %3)
 ret void 
 }
 
 define void @Int$Int$(%class.Int* %this){
 entry:
-%7 = bitcast i32 %this to %class.Object*
-call void @Object$Object$(%class.Object* %7)
+%4 = bitcast i32 %this to %class.Object*
+call void @Object$Object$(%class.Object* %4)
 ret void 
 }
 
@@ -178,17 +174,17 @@ ret i8* %1
 
 define void @reportError0(){
 entry:
-%8 = getelementptr inbounds [42 X i8], [42 X i8]* @globalstring12 , i32 0 , i32 0
-%9 = getelementptr inbounds [3 X i8], [3 X i8]* @globalstring4 , i32 0 , i32 0
-%r = call i32 (i8*, ...) @printf(i8* %9, i8* %8)
+%5 = getelementptr inbounds [42 X i8], [42 X i8]* @globalstring12 , i32 0 , i32 0
+%6 = getelementptr inbounds [3 X i8], [3 X i8]* @globalstring4 , i32 0 , i32 0
+%r = call i32 (i8*, ...) @printf(i8* %6, i8* %5)
 ret void
 }
 
 define void @reportErrorVoid(){
 entry:
-%10 = getelementptr inbounds [45 X i8], [45 X i8]* @globalstring13 , i32 0 , i32 0
-%11 = getelementptr inbounds [3 X i8], [3 X i8]* @globalstring4 , i32 0 , i32 0
-%r = call i32 (i8*, ...) @printf(i8* %11, i8* %10)
+%7 = getelementptr inbounds [45 X i8], [45 X i8]* @globalstring13 , i32 0 , i32 0
+%8 = getelementptr inbounds [3 X i8], [3 X i8]* @globalstring4 , i32 0 , i32 0
+%r = call i32 (i8*, ...) @printf(i8* %8, i8* %7)
 ret void
 }
 

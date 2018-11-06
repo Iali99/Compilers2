@@ -1,6 +1,6 @@
 class Main {
-	main():IO {
-		new IO.out_string("Hello world!\n")
+	a: Int;
+	main():Int {
+		a
 	};
 };
-

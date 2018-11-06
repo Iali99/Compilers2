@@ -85,7 +85,7 @@ public class VisitorUtils{
 
 	public static void visitAllClassesDFS(AST.class_ node){
 		GlobalData.attrScopeTable.enterScope();
-        if(GlobalData.Const.is_structable(node.name)){
+        if(!GlobalData.Const.is_standard_class_name(node.name)){
         	Visitor.visitMethods(node);
         }
         // iterate through all the child nodes
