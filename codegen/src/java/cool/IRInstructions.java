@@ -222,4 +222,13 @@ public class IRInstrucions{
     .append("call void @exit(i32 1)\n");
     GlobalData.out.println(ir.toString());
   }
+
+  /* Constructor Instructions
+  */
+
+  public static void callConstructorInstruction(String class, String args){
+    StringBuilder a = new StringBuilder("");
+    a.append(GlobalData.makeClassTypeOrPointer(class)).append(" ").append(args);
+    String r = IRInstrucions.addCallInstruction("void",GlobalData.mangledName(class,class),a.toString());
+  }
 }
