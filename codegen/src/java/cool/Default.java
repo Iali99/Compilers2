@@ -124,7 +124,6 @@ public class Default{
     GlobalData.out.println("entry:");
     String error = IRInstrucions.addGEPInstruction(GLobalData.Const.ZERO_ERROR);
     String s = IRInstrucions.addGEPInstruction("%s");
-    %2 = call i32 (i8*, ...) @printf(i8* %0, i8* %1)
     GLobalData.out.print("%r = call i32 (i8*, ...) @printf(i8* ");
     GlobalData.out.print(s);
     GlobalData.out.print(", i8* ");
@@ -137,7 +136,6 @@ public class Default{
     GlobalData.out.println("entry:");
     String error = IRInstrucions.addGEPInstruction(GLobalData.Const.VOID_ERROR);
     String s = IRInstrucions.addGEPInstruction("%s");
-    %2 = call i32 (i8*, ...) @printf(i8* %0, i8* %1)
     GLobalData.out.print("%r = call i32 (i8*, ...) @printf(i8* ");
     GlobalData.out.print(s);
     GlobalData.out.print(", i8* ");
