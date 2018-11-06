@@ -121,7 +121,7 @@ public class Visitor{
   		String ret = visit(m.body);
   		// bit casting if type mismatch
   		if(!m.typeid.equals(m.body.type)){
-  			// TODO : bitcast
+  			ret = IRInstructions.addConvertInstruction("bitcast", m.body.type, m.typeid, ret);
   		}
   		GlobalData.out.println("ret " + GlobalData.makeClassTypeOrPointer(m.typeid) + " " + ret);
   		GlobalData.out.println("}");

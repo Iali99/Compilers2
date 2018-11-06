@@ -209,13 +209,13 @@ public class GlobalData{
   static {
   		strCounter = 0;
   		loopCounter = 0;
-      ifCounter = 0;
+      	ifCounter = 0;
   		attrIndexMap = new HashMap<String, Integer>();
   		strConsToRegister = new HashMap<String, Integer>();
         classTable = new HashMap<String, String>();
         attrScopeTable = new ScopeTable<String>();
   		methodScopeTable = new ScopeTable<String>();
-      formalsMangledList = new ArrayList<String>();
+      	formalsMangledList = new ArrayList<String>();
     }
 
 }
