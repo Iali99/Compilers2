@@ -124,7 +124,7 @@ public class GlobalData{
   public static HashMap<String, String> classTable;
   // maps a class to a list of it's variables
   // public static Hashmap<String, ArrayList<String>>
-  // inheritance graph 
+  // inheritance graph
   public static InheritanceGraph inheritanceGraph;
   //Stores the IR
   public static PrintWriter out;
@@ -144,6 +144,8 @@ public class GlobalData{
   public static ScopeTable<String> methodScopeTable;
   //Hashmap to store class size vs class name.
   public static HashMap<String,Integer> classNameToSize;
+  //list to store mangled names of formals of methods.
+  public static List<String> formalsMangledList;
   // makes address name for a name
   public static String makeAddressName(String name){
   	return "%"+name+".a_";
@@ -160,7 +162,7 @@ public class GlobalData{
         return "i8*";
     } else if(GlobalData.Const.INT_TYPE.equals(cl)) {
         return "i32";
-    } else if(GlobalData.Const.BOOL_TYPE.equals(cl)) 
+    } else if(GlobalData.Const.BOOL_TYPE.equals(cl))
         return "i8";
     return makeStructName(cl) + "*";
   }
@@ -182,6 +184,13 @@ public class GlobalData{
     return mangledName.toString();
   }
 
+  //function to get mangled name of a formal.
+  public static String mangledFormalName(String class,String method,String formal){
+    StringBuilder mangledName = new StringBuilder();
+    mangledName.append(class).append("$");
+    mangledName.append(method).append("$").append(formal).append("$");
+    return mangledName.toStrign();
+  }
   public static void addStringsAsGlobal(){
     GlobalData.out.println("");
     StringBuilder builder = new StringBuilder("");
@@ -197,11 +206,12 @@ public class GlobalData{
   static {
   		strCounter = 0;
   		loopCounter = 0;
-  		attrIndexMap = new Hashmap<String, int>(); 
+  		attrIndexMap = new Hashmap<String, int>();
   		strConsToRegister = new Map<String, int>();
         classTable = new HashMap<String, String>();
         attrScopeTable = new ScopeTable<String>();
   		methodScopeTable = new ScopeTable<String>();
+      formalsMangledList = new ArrayList<String>();
     }
 
 }

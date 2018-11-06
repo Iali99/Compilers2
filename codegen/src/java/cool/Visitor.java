@@ -2,7 +2,7 @@ package cool;
 import java.util.*;
 public class Visitor{
 	public static AST.class_ thisClass;
-
+	public static AST.method thisMethod;
 	public void visit(AST.program p){
 		GlobalData.inheritanceGraph = new inheritanceGraph(p);
 		for(AST.class_ cl: prog.classes) {
@@ -25,7 +25,7 @@ public class Visitor{
 	public static void visit(AST.attr at){
 		String value = visit(at.value);
 		String gep = IRInstructions.addGEPInstruction(thisClass.name, "%this", at.name);
-        
+
 		if(value == null){
 			if(!GlobalData.Conts.is_structable(at.typeid)){
 				// is not structable hence, store default value
@@ -86,12 +86,14 @@ public class Visitor{
 
     // visit for method
     public void visit(AST.method m){
+			thisMethod = m;
     	GlobalData.loopCounter = 0;
   		StringBuilder ir = new StringBuilder();
   		ir.append("define ").append(GlobalData.makeClassTypeOrPointer(m.typeid)).append(" ");
   		ir.append("@").append(GlobalData.mangledName(thisClass.name, m));
   		ir.append("(").append(GlobalData.makeClassTypeOrPointer(thisClass.name)).append(" %this");
   		for(AST.formal f : m.formals){
+				GlobalData.formalsMangledList.put(GlobalData.mangledFormalName(thisClass.name,thisMethod.name,f.name));
   			ir.append(", ").append(GlobalData.makeClassTypeOrPointer(f.typeid)).append(" %").append(f.name);
   		}
   		ir.append("){");
