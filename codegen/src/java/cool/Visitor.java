@@ -99,6 +99,10 @@ public class Visitor{
   		ir.append("){");
   		GlobalData.out.println(ir.toString());
   		GlobalData.out.println();
+			IRInstrucions.add0ErrorLabel();
+			GlobalData.out.println();
+			IRInstrucions.addVoidErrorLabel();
+			GlobalData.out.println();
   		GlobalData.out.println("entry:");
   		// allocating address for formals
   		for(AST.formal f : m.formals){
