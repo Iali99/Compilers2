@@ -109,14 +109,14 @@ public class Default{
     GlobalData.out.println();
 
     //Class: String, Method: substr
-    GlobalData.out.println("define i8* " + "@" + GlobalData.mangledName(GlobalData.Const.STRING_TYPE, "substr") + "(i8* %s1, i32 %index, i32 %len) {")
-    GlobalData.out.println("entry:")
-    GlobalData.out.println("%0 = zext i32 %len to i64")
-    GlobalData.out.println("%1 = call noalias i8* @malloc(i64 %0)")
-    GlobalData.out.println("%2 = getelementptr inbounds i8, i8* %s1, i32 %index")
-    GlobalData.out.println("%3 = call i8* @strncpy(i8* %1, i8* %2, i64 %0)")
-    GlobalData.out.println("ret i8* %1")
-    GlobalData.out.println("}")
+    GlobalData.out.println("define i8* " + "@" + GlobalData.mangledName(GlobalData.Const.STRING_TYPE, "substr") + "(i8* %s1, i32 %index, i32 %len) {");
+    GlobalData.out.println("entry:");
+    GlobalData.out.println("%0 = zext i32 %len to i64");
+    GlobalData.out.println("%1 = call noalias i8* @malloc(i64 %0)");
+    GlobalData.out.println("%2 = getelementptr inbounds i8, i8* %s1, i32 %index");
+    GlobalData.out.println("%3 = call i8* @strncpy(i8* %1, i8* %2, i64 %0)");
+    GlobalData.out.println("ret i8* %1");
+    GlobalData.out.println("}");
     GlobalData.out.println();
   }
 
