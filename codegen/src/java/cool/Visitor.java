@@ -78,7 +78,11 @@ public class Visitor{
 	public void visitMethods(AST.class_ cl) {
 		thisClass = cl;
         for(AST.feature f : cl.features) {
-            if(f instanceof AST.method) {
+        	if(f instanceof AST.attr) {
+        		a = (AST.attr) f;
+                GlobalData.attrScopeTable.insert(a.name, a.typeid);
+            }
+            else if(f instanceof AST.method) {
                 visit((AST.method) f);
             }
         }
@@ -86,7 +90,8 @@ public class Visitor{
 
     // visit for method
     public void visit(AST.method m){
-			thisMethod = m;
+    	GlobalData.attrScopeTable.enterScope();
+		thisMethod = m;
     	GlobalData.loopCounter = 0;
   		StringBuilder ir = new StringBuilder();
   		ir.append("define ").append(GlobalData.makeClassTypeOrPointer(m.typeid)).append(" ");
@@ -106,6 +111,7 @@ public class Visitor{
   		GlobalData.out.println("entry:");
   		// allocating address for formals
   		for(AST.formal f : m.formals){
+  			GlobalData.attrScopeTable.insert(f.name, f.typeid);
   			IRInstructions.addAlloca(GlobalData.makeClassTypeOrPointer(f.typeid), GlobalData.makeAddressName(f.name));
   			IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(f.typeid), "%"+f.name, GlobalData.makeAddressName(f.name));
   		}
@@ -117,5 +123,6 @@ public class Visitor{
   		GlobalData.out.println("ret " + GlobalData.makeClassTypeOrPointer(m.typeid) + " " + ret);
   		GlobalData.out.println("}");
   		GlobalData.out.println();
+    	GlobalData.attrScopeTable.exitScope();
     }
 }

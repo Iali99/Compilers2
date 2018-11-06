@@ -6,7 +6,6 @@ public class VisitorUtils{
 		GlobalData.out.println();
         GlobalData.out.println("; Struct declarations");
         GlobalData.out.println(GlobalData.makeStructName(GlobalData.Const.ROOT_TYPE) + " = type {i8*}");
-        // GlobalData.classToVariableToIndexListMap.put(GlobalData.Const.ROOT_TYPE, new HashMap<>());
 
         for(AST.class_ cl: GlobalData.ROOT_CLASS.children) {
             addStructsAllClassesDFS(cl);
@@ -85,12 +84,15 @@ public class VisitorUtils{
 	}
 
 	public static void visitAllClassesDFS(AST.class_ node){
-        if(GlobalData.Const.is_structable(node.name))
+		GlobalData.attrScopeTable.enterScope();
+        if(GlobalData.Const.is_structable(node.name)){
         	Visitor.visitMethods(node);
+        }
         // iterate through all the child nodes
         for(AST.class_ child: node.children) {
             visitAllClassesDFS(child);
         }
+        GlobalData.attrScopeTable.exitScope();
     }
 
 }
