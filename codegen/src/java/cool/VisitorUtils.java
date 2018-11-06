@@ -1,5 +1,6 @@
 package cool;
-
+import java.util.*;
+import java.io.PrintWriter;
 public class VisitorUtils{
 	// adds structs for all classes staring from root in dfs fashion
 	public static void addStructsAllClasses(){
@@ -10,10 +11,10 @@ public class VisitorUtils{
         for(AST.class_ cl: GlobalData.ROOT_CLASS.children) {
             addStructsAllClassesDFS(cl);
         }
-        Global.out.println();
+        GlobalData.out.println();
 	}
 
-	public static void addStructsAllClassesDFS(AST_class_ cl){
+	public static void addStructsAllClassesDFS(AST.class_ cl){
 		int attrCounter = 1;
 		if(!GlobalData.Const.is_structable(cl.name))
         	return;
@@ -24,7 +25,7 @@ public class VisitorUtils{
             if(f instanceof AST.attr) {
                 AST.attr a = (AST.attr) f;
                 GlobalData.attrIndexMap.put(GlobalData.mangledName(cl.name, a.name), attrCounter);
-                attrCounter++;	               
+                attrCounter++;
                 ir.append(", ").append(GlobalData.makeClassTypeOrPointer(a.typeid));
             }
     	}
@@ -52,7 +53,7 @@ public class VisitorUtils{
 		// visit attributes
 		for(AST.feature f : cl.features) {
             if(f instanceof AST.attr) {
-                AST.attr a = (AST.attr) f;	               
+                AST.attr a = (AST.attr) f;
                 Visitor.visit(a);
             }
     	}

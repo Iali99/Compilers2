@@ -1,6 +1,7 @@
 package cool;
-
-public class IRInstrucions{
+import java.util.*;
+import java.io.PrintWriter;
+public class IRInstructions{
 
   public static int alignment(String type){
     if(type.substring(type.length()-1).equals("*"))
@@ -106,8 +107,8 @@ public class IRInstrucions{
 	  // iterating through classes and checking if attr is contained or not
 	  	String it = cl;
 	  	while(!it.equals(GlobalData.Const.ROOT_TYPE)){
-      		if(GlobalData.attrIndexMap.containsKey(mangledName(it, attr))){
-      			ir.append(", i32 ").append(GlobalData.attrIndexMap.get(mangledName(it, attr)));
+      		if(GlobalData.attrIndexMap.containsKey(GlobalData.mangledName(it, attr))){
+      			ir.append(", i32 ").append(GlobalData.attrIndexMap.get(GlobalData.mangledName(it, attr)));
       			break;
     		}
     		ir.append(", i32 0");
@@ -201,7 +202,7 @@ public class IRInstrucions{
     String retRegister = "";
     if(!type.equals("void")){
       retRegister = "%" + GlobalData.Counter;
-      ir.insert(0,retRegister+" ")
+      ir.insert(0,retRegister+" ");
     }
     GlobalData.out.println(ir.toString());
     return retRegister;
@@ -226,9 +227,9 @@ public class IRInstrucions{
   /* Constructor Instructions
   */
 
-  public static void callConstructorInstruction(String class, String args){
+  public static void callConstructorInstruction(String cl, String args){
     StringBuilder a = new StringBuilder("");
-    a.append(GlobalData.makeClassTypeOrPointer(class)).append(" ").append(args);
-    String r = IRInstrucions.addCallInstruction("void",GlobalData.mangledName(class,class),a.toString());
+    a.append(GlobalData.makeClassTypeOrPointer(cl)).append(" ").append(args);
+    String r = IRInstructions.addCallInstruction("void",GlobalData.mangledName(cl,cl),a.toString());
   }
 }

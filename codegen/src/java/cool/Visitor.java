@@ -1,16 +1,17 @@
 package cool;
 import java.util.*;
+import java.io.PrintWriter;
 public class Visitor{
 	public static AST.class_ thisClass;
 	public static AST.method thisMethod;
 	public void visit(AST.program p){
-		GlobalData.inheritanceGraph = new inheritanceGraph(p);
-		for(AST.class_ cl: prog.classes) {
+		GlobalData.inheritanceGraph = new InheritanceGraph(p);
+		for(AST.class_ cl: p.classes) {
             if(!GlobalData.strConsToRegister.containsKey(cl.name)) {
                 GlobalData.strConsToRegister.put(cl.name, GlobalData.strCounter);
                 GlobalData.strCounter++;
             }
-            GlobalData.inheritanceGraph.addClass(cl);
+            GlobalData.inheritanceGraph.insert(cl);
         }
         Default.addDefaultStrings();
 				Default.addCdecls();
@@ -28,7 +29,7 @@ public class Visitor{
 		String gep = IRInstructions.addGEPInstruction(thisClass.name, "%this", at.name);
 
 		if(value == null){
-			if(!GlobalData.Conts.is_structable(at.typeid)){
+			if(!GlobalData.Const.is_structable(at.typeid)){
 				// is not structable hence, store default value
 				value = GlobalData.getDefaultValue(at.typeid);
 				IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(at.typeid), value, gep);
@@ -40,7 +41,7 @@ public class Visitor{
 			}
 		}
 		else{
-			if(!GlobalData.Conts.is_structable(at.typeid)){
+			if(!GlobalData.Const.is_structable(at.typeid)){
 				// simply store value
 				IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(at.typeid), value, gep);
 			}
@@ -51,9 +52,9 @@ public class Visitor{
 				else{
 					if(!GlobalData.Const.is_structable(at.value.type)){
 						// at.value to be casted to object
-						AST.new_ n = new AST.new_(Global.Constants.ROOT_TYPE, 0);
+						AST.new_ n = new AST.new_(GlobalData.Const.ROOT_TYPE, 0);
                         n.type = GlobalData.Const.ROOT_TYPE;
-                        value = visit(newObj);
+                        value = visit(n);
                         // typename fixing
                         String gep_ = IRInstructions.addGEPInstruction(GlobalData.Const.ROOT_TYPE, value, "");
                         String value_ = IRInstructions.addGEPInstruction(at.value.type);
@@ -80,7 +81,7 @@ public class Visitor{
 		thisClass = cl;
         for(AST.feature f : cl.features) {
         	if(f instanceof AST.attr) {
-        		a = (AST.attr) f;
+        		AST.attr a = (AST.attr) f;
                 GlobalData.attrScopeTable.insert(a.name, a.typeid);
             }
             else if(f instanceof AST.method) {
@@ -94,21 +95,21 @@ public class Visitor{
     	GlobalData.attrScopeTable.enterScope();
 		  thisMethod = m;
     	GlobalData.loopCounter = 0;
-			GLobalData.ifCounter = 0;
+			GlobalData.ifCounter = 0;
   		StringBuilder ir = new StringBuilder();
   		ir.append("define ").append(GlobalData.makeClassTypeOrPointer(m.typeid)).append(" ");
   		ir.append("@").append(GlobalData.mangledName(thisClass.name, m));
   		ir.append("(").append(GlobalData.makeClassTypeOrPointer(thisClass.name)).append(" %this");
   		for(AST.formal f : m.formals){
-				GlobalData.formalsMangledList.put(GlobalData.mangledFormalName(thisClass.name,thisMethod.name,f.name));
+				GlobalData.formalsMangledList.add(GlobalData.mangledFormalName(thisClass.name,thisMethod.name,f.name));
   			ir.append(", ").append(GlobalData.makeClassTypeOrPointer(f.typeid)).append(" %").append(f.name);
   		}
   		ir.append("){");
   		GlobalData.out.println(ir.toString());
   		GlobalData.out.println();
-			IRInstrucions.add0ErrorLabel();
+			IRInstructions.add0ErrorLabel();
 			GlobalData.out.println();
-			IRInstrucions.addVoidErrorLabel();
+			IRInstructions.addVoidErrorLabel();
 			GlobalData.out.println();
   		GlobalData.out.println("entry:");
   		// allocating address for formals
@@ -135,27 +136,31 @@ public class Visitor{
 		}
 
 		public String visit(AST.string_const e){
-		  GlobalData.strConsToRegister.put(e.value,strCounter);
-		  strCounter++;
-		  String retRegister = IRInstrucions.addGEPInstruction(e.value);
+		  GlobalData.strConsToRegister.put(e.value,GlobalData.strCounter);
+		  GlobalData.strCounter++;
+		  String retRegister = IRInstructions.addGEPInstruction(e.value);
 		  return retRegister;
 		}
 
 		public String visit(AST.int_const e){
 		  return Integer.toString(e.value);
 		}
-
+		public boolean isMethodParam(String name){
+			if(GlobalData.formalsMangledList.contains(GlobalData.mangledFormalName(Visitor.thisClass.name,Visitor.thisMethod.name,name)))
+				return true;
+			return false;
+		}
 		public String visit(AST.object e){
 		  if(e.name.equals("self"))
 		    return "%this";
 		  String retRegister;
 		  if(isMethodParam(e.name)){
-		    retRegister = IRInstrucions.addLoadInstruction(GlobalData.makeClassTypeOrPointer(e.type),GlobalData.makeAddressName(e.name));
+		    retRegister = IRInstructions.addLoadInstruction(GlobalData.makeClassTypeOrPointer(e.type),GlobalData.makeAddressName(e.name));
 		    return retRegister;
 		  }
 		  else{
-		    String addr = IRInstrucions.addGEPInstruction(e.type,"%this",e.name);
-		    retRegister = IRInstrucions.addLoadInstruction(GlobalData.makeClassTypeOrPointer(e.type),addr);
+		    String addr = IRInstructions.addGEPInstruction(e.type,"%this",e.name);
+		    retRegister = IRInstructions.addLoadInstruction(GlobalData.makeClassTypeOrPointer(e.type),addr);
 		    return retRegister;
 		  }
 
@@ -163,73 +168,73 @@ public class Visitor{
 
 		public String visit(AST.comp e){
 		  String e1 = visit(e.e1);
-		  String retRegister = IRInstrucions.addBinaryInstruction("xor","bool",e1,"1");
+		  String retRegister = IRInstructions.addBinaryInstruction("xor","bool",e1,"1");
 		}
 
 		public String visit(AST.eq e){
 		  String e1 = visit(e.e1);
 		  String e2 = visit(e.e2);
-		  String retRegister = IRInstrucions.addIcmpInstruction("eq",Global.makeClassTypeOrPointer(e1.type),e1,e2);
+		  String retRegister = IRInstructions.addIcmpInstruction("eq",GlobalData.makeClassTypeOrPointer(e.e1.type),e1,e2);
 		  return retRegister;
 		}
 
 		public String visit(AST.leq e){
 		  String e1 = visit(e.e1);
 		  String e2 = visit(e.e2);
-		  String retRegister = IRInstrucions.addIcmpInstruction("sle",Global.makeClassTypeOrPointer(e1.type),e1,e2);
+		  String retRegister = IRInstructions.addIcmpInstruction("sle",GlobalData.makeClassTypeOrPointer(e.e1.type),e1,e2);
 		  return retRegister;
 		}
 
 		public String visit(AST.lt e){
 		  String e1 = visit(e.e1);
 		  String e2 = visit(e.e2);
-		  String retRegister = IRInstrucions.addIcmpInstruction("slt",Global.makeClassTypeOrPointer(e1.type),e1,e2);
+		  String retRegister = IRInstructions.addIcmpInstruction("slt",GlobalData.makeClassTypeOrPointer(e.e1.type),e1,e2);
 		  return retRegister;
 		}
 
 		public String visit(AST.neg e){
 		  String e1 = visit(e.e1);
-		  String retRegister = IRInstrucions.addBinaryInstruction("sub",e1.type,"0",r);
+		  String retRegister = IRInstructions.addBinaryInstruction("sub",e.e1.type,"0",e1);
 		  return retRegister;
 		}
 
 
 
-		public Strign visit(AST.divide e){
+		public String visit(AST.divide e){
 		  String e1 = visit(e.e1);
 		  String e2 = visit(e.e2);
-		  String check = IRInstrucions.addIcmpInstruction("eq","i32",e2,"0");
-		  IRInstrucions.addBrInstruction(check,"%divide0true","%divide0false");
+		  String check = IRInstructions.addIcmpInstruction("eq","i32",e2,"0");
+		  IRInstructions.addBrInstruction(check,"%divide0true","%divide0false");
 		  StringBuilder ir = new StringBuilder("\n");
 		  ir.append("divide0false :\n");
-		  String retRegister = IRInstrucions.addBinaryInstruction("sdiv",e1.type,e1,e2);
+		  String retRegister = IRInstructions.addBinaryInstruction("sdiv",e.e1.type,e1,e2);
 		  return retRegister;
 		}
 
-		public Strign visit(AST.mul e){
+		public String visit(AST.mul e){
 		  String e1 = visit(e.e1);
 		  String e2 = visit(e.e2);
-		  String retRegister = IRInstrucions.addBinaryInstruction("mul",e1.type,e1,e2);
+		  String retRegister = IRInstructions.addBinaryInstruction("mul",e.e1.type,e1,e2);
 		  return retRegister;
 		}
 
-		public Strign visit(AST.sub e){
+		public String visit(AST.sub e){
 		  String e1 = visit(e.e1);
 		  String e2 = visit(e.e2);
-		  String retRegister = IRInstrucions.addBinaryInstruction("sub",e1.type,e1,e2);
+		  String retRegister = IRInstructions.addBinaryInstruction("sub",e.e1.type,e1,e2);
 		  return retRegister;
 		}
 
-		public Strign visit(AST.plus e){
+		public String visit(AST.plus e){
 		  String e1 = visit(e.e1);
 		  String e2 = visit(e.e2);
-		  String retRegister = IRInstrucions.addBinaryInstruction("add",e1.type,e1,e2);
+		  String retRegister = IRInstructions.addBinaryInstruction("add",e.e1.type,e1,e2);
 		  return retRegister;
 		}
 
-		public String visit(AST.isVoid e){
+		public String visit(AST.isvoid e){
 		  String e1 = visit(e.e1);
-		  String retRegister = IRInstrucions.addIcmpInstruction("eq","i1",e1,"null");
+		  String retRegister = IRInstructions.addIcmpInstruction("eq","i1",e1,"null");
 		  return retRegister;
 		}
 
@@ -240,30 +245,30 @@ public class Visitor{
 		  if(e.typeid.equals("bool"))
 		    return "0";
 		  if(e.typeid.equals("string")){
-		    retRegister = IRInstrucions.addGEPInstruction("");
+		    retRegister = IRInstructions.addGEPInstruction("");
 		    return retRegister;
 		  }
 		  retRegister = "%" + Integer.toString(GlobalData.Counter);
 		  GlobalData.Counter++;
 		  StringBuilder ir = new StringBuilder(retRegister);
 		  ir.append(" = call noalias i8* @malloc(i64 ")
-		  .append(GlobalData.classNameToSize(e.typeid)).append(" )");
+		  .append(GlobalData.classNameToSize.get(e.typeid)).append(" )");
 		  GlobalData.out.println(ir.toString());
 		  return retRegister;
 		}
 
 		public String visit(AST.assign e){
 		  String e1 = visit(e.e1);
-		  String type = GlobalData.attrScopeTable.get(e.name);
+		  String type = GlobalData.attrScopeTable.lookUpLocal(e.name);
 		  if(!type.equals(e.e1.type)){
-		    e1 = IRInstrucions.addConvertInstruction("bitcast",e.e1.type,type,e1);
+		    e1 = IRInstructions.addConvertInstruction("bitcast",e.e1.type,type,e1);
 		  }
 		  if(GlobalData.formalsMangledList.contains(GlobalData.mangledFormalName(Visitor.thisClass.name,Visitor.thisMethod.name,e.name))){
-		    IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,GlobalData.makeAddressName(e.name));
+		    IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,GlobalData.makeAddressName(e.name));
 		  }
 		  else{
-		    String addr = IRInstrucions.addGEPInstruction(Visitor.thisClass.name,"%this",e.name);
-		    IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,addr);
+		    String addr = IRInstructions.addGEPInstruction(Visitor.thisClass.name,"%this",e.name);
+		    IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(type),e1,addr);
 		  }
 		  return null;
 		}
@@ -277,19 +282,19 @@ public class Visitor{
 		}
 
 		public String visit(AST.loop e){
-		  e.counter = loopCounter;
-		  loopCounter++;
-		  IRInstrucions.addBrInstruction("%loopCond"+Integer.toString(e.counter));
+		  e.counter = GlobalData.loopCounter;
+		  GlobalData.loopCounter++;
+		  IRInstructions.addBrInstruction("%loopCond"+Integer.toString(e.counter));
 		  StringBuilder ir = new StringBuilder("\n");
 		  ir.append("loopCond").append(e.counter).append(":\n");
 		  GlobalData.out.println(ir.toString());
 		  String pred = visit(e.predicate);
-		  IRInstrucions.addBrInstruction(pred,"%loopBody"+Integer.toString(e.counter),"%loopEnd"+Integer.toString(e.counter));
+		  IRInstructions.addBrInstruction(pred,"%loopBody"+Integer.toString(e.counter),"%loopEnd"+Integer.toString(e.counter));
 		  ir.setLength(0);
 		  ir.append("\nloopBody"+Integer.toString(e.counter)+":");
 		  GlobalData.out.println(ir.toString());
-		  String retRegister = visit(body);
-		  IRInstrucions.addBrInstruction("%loopCond"+Integer.toString(e.counter));
+		  String retRegister = visit(e.body);
+		  IRInstructions.addBrInstruction("%loopCond"+Integer.toString(e.counter));
 		  ir.setLength(0);
 		  ir.append("\nloopEnd"+Integer.toString(e.counter)+":");
 		  GlobalData.out.println(ir.toString());
@@ -297,23 +302,23 @@ public class Visitor{
 		}
 
 		public String visit(AST.cond e){
-		  e.counter = ifCounter;
-		  ifCounter++;
+		  e.counter = GlobalData.ifCounter;
+		  GlobalData.ifCounter++;
 		  String pred = visit(e.predicate);
-		  String retRegister = IRInstrucions.addAlloca(e.ifbody.type);
-		  IRInstrucions.addBrInstruction(pred,"%ifBody"+Integer.toString(e.counter),"%elseBody"+Integer.toString(e.counter));
+		  String retRegister = IRInstructions.addAlloca(e.ifbody.type);
+		  IRInstructions.addBrInstruction(pred,"%ifBody"+Integer.toString(e.counter),"%elseBody"+Integer.toString(e.counter));
 		  StringBuilder ir = new StringBuilder("\n");
 		  ir.append("ifBody").append(e.counter).append(":");
 		  GlobalData.out.println(ir.toString());
 		  String ifReg = visit(e.ifbody);
-		  IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(e.ifBody.type),ifReg,retRegister);
-		  IRInstrucions.addBrInstruction("%ifEnd"+Integer.toString(e.counter));
+		  IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(e.ifbody.type),ifReg,retRegister);
+		  IRInstructions.addBrInstruction("%ifEnd"+Integer.toString(e.counter));
 		  ir.setLength(0);
 		  ir.append("elseBody").append(e.counter).append(":");
 		  GlobalData.out.println(ir.toString());
 		  String elseReg = visit(e.ifbody);
-		  IRInstrucions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(e.ifBody.type),elseReg,retRegister);
-		  IRInstrucions.addBrInstruction("%ifEnd"+Integer.toString(e.counter));
+		  IRInstructions.addStoreInstruction(GlobalData.makeClassTypeOrPointer(e.ifbody.type),elseReg,retRegister);
+		  IRInstructions.addBrInstruction("%ifEnd"+Integer.toString(e.counter));
 		  ir.setLength(0);
 		  ir.append("ifEnd").append(e.counter).append(":");
 		  GlobalData.out.println(ir.toString());
@@ -322,27 +327,73 @@ public class Visitor{
 
 		public String visit(AST.static_dispatch e){
 		  String caller = visit(e.caller);
-		  String alloca = IRInstrucions.addAlloca(e.caller.type);
+		  String alloca = IRInstructions.addAlloca(e.caller.type);
 		  String type = GlobalData.makeClassTypeOrPointer(e.caller.type);
-		  if(!isPrim(type)){
+		  if(!IRInstructions.isPrim(type)){
 		    type = type.substring(0,type.length()-1);
 		  }
-		  IRInstrucions.addStoreInstruction(type,caller,alloca);
-		  String comp = IRInstrucions.addIcmpInstruction("eq",GLobalData.makeClassTypeOrPointer(e.caller.type),alloca,"null");
-		  IRInstrucions.addBrInstruction(comp,"%voidTrue","%voidFalse");
-		  GLobalData.out.println("voidFalse :");
+		  IRInstructions.addStoreInstruction(type,caller,alloca);
+		  String comp = IRInstructions.addIcmpInstruction("eq",GlobalData.makeClassTypeOrPointer(e.caller.type),alloca,"null");
+		  IRInstructions.addBrInstruction(comp,"%voidTrue","%voidFalse");
+		  GlobalData.out.println("voidFalse :");
 		  if(!e.caller.type.equals(e.typeid)){
-		    caller = IRInstrucions.addConvertInstruction("bitcast",e.caller.type,e.typeid,caller)
+		    caller = IRInstructions.addConvertInstruction("bitcast",e.caller.type,e.typeid,caller);
 		  }
 		  StringBuilder args = new StringBuilder(GlobalData.makeClassTypeOrPointer(e.typeid));
 		  args.append(" ").append(caller);
 		  for(int i =0;i<e.actuals.size();i++){
-		    String actual = visit(e.actual.get(i));
+		    String actual = visit(e.actuals.get(i));
 		    args.append(", ").append(GlobalData.makeClassTypeOrPointer(e.actuals.get(i).type))
 		    .append(actual);
 		  }
-		  String retRegister = IRInstrucions.addCallInstruction(e.typeid,GlobalData.mangledName(e.name),args.toString());
+		  String retRegister = IRInstructions.addCallInstruction(e.typeid,GlobalData.mangledName(e.typeid,e.name),args.toString());
 		  return retRegister;
+		}
+
+		public String visit(AST.expression e){
+			if(e == null) return null;
+			if(e instanceof AST.no_expr)
+					return visit((AST.no_expr)e);
+			if(e instanceof AST.bool_const)
+				return visit((AST.bool_const)e);
+			if(e instanceof AST.string_const)
+				return visit((AST.string_const)e);
+			if(e instanceof AST.int_const)
+				return visit((AST.int_const)e);
+			if(e instanceof AST.object)
+				return visit((AST.object)e);
+			if(e instanceof AST.comp)
+				return visit((AST.comp)e);
+			if(e instanceof AST.eq)
+				return visit((AST.eq)e);
+			if(e instanceof AST.leq)
+				return visit((AST.leq)e);
+			if(e instanceof AST.lt)
+				return visit((AST.lt)e);
+			if(e instanceof AST.neg)
+				return visit((AST.neg)e);
+			if(e instanceof AST.divide)
+				return visit((AST.divide)e);
+			if(e instanceof AST.mul)
+				return visit((AST.mul)e);
+			if(e instanceof AST.sub)
+				return visit((AST.sub)e);
+			if(e instanceof AST.plus)
+				return visit((AST.plus)e);
+			if(e instanceof AST.isvoid)
+				return visit((AST.isvoid)e);
+			if(e instanceof AST.new_)
+				return visit((AST.new_)e);
+			if(e instanceof AST.assign)
+				return visit((AST.assign)e);
+			if(e instanceof AST.block)
+				return visit((AST.block)e);
+			if(e instanceof AST.loop)
+				return visit((AST.loop)e);
+			if(e instanceof AST.cond)
+				return visit((AST.cond)e);
+			if(e instanceof AST.static_dispatch)
+				return visit((AST.static_dispatch)e);
 		}
 
 }

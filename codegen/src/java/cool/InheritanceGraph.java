@@ -1,5 +1,6 @@
 package cool;
 import java.util.*;
+import java.io.PrintWriter;
 public class InheritanceGraph{
 
   private HashMap<String, AST.class_> graph = new HashMap<String, AST.class_>();
@@ -54,7 +55,6 @@ public class InheritanceGraph{
 
   //insert a class in the inheritance graph.
   public void insert(AST.class_ c){
-    GlobalData.filename = c.filename;
      graph.put(c.name,c);
   }
 

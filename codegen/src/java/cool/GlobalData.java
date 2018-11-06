@@ -1,5 +1,6 @@
 package cool;
-
+import java.util.*;
+import java.io.PrintWriter;
 public class GlobalData{
   public static class Const {
 	public static final String ROOT_TYPE = "Object";
@@ -104,11 +105,11 @@ public class GlobalData{
   }
   // default values
   public static String getDefaultValue(String type) {
-        if(GlobalData.Constants.INT_TYPE.equals(type)) {
+        if(GlobalData.Const.INT_TYPE.equals(type)) {
             return "0";
-        } else if(GlobalData.Constants.BOOL_TYPE.equals(type)) {
+        } else if(GlobalData.Const.BOOL_TYPE.equals(type)) {
             return "0";
-        } else if(GlobalData.Constants.STRING_TYPE.equals(type)) {
+        } else if(GlobalData.Const.STRING_TYPE.equals(type)) {
             return IRInstructions.addGEPInstruction("");
         } else {
             return "undef";
@@ -116,8 +117,8 @@ public class GlobalData{
   }
 
   // makes struct name for class
-  public static String makeStructName(String class){
-  	return "%class." + class;
+  public static String makeStructName(String cl){
+  	return "%class." + cl;
   }
 
   // ClassTable - maps class name to class parent
@@ -135,11 +136,11 @@ public class GlobalData{
   // counter for if else
   public static int ifCounter;
   // map from string constant to register
-  public static Map<String, int> strConsToRegister;
+  public static Map<String, Integer> strConsToRegister;
   //Counter for Global string registers.
   public static int strCounter;
   // attribute mangled name with class to index map
-  public static Hashmap<String, int> attrIndexMap;
+  public static HashMap<String, Integer> attrIndexMap;
   // variable name -> variable return type
   public static ScopeTable<String> attrScopeTable;
   // function name -> FunctionTypeMangledName
@@ -187,11 +188,11 @@ public class GlobalData{
   }
 
   //function to get mangled name of a formal.
-  public static String mangledFormalName(String class,String method,String formal){
+  public static String mangledFormalName(String cl,String method,String formal){
     StringBuilder mangledName = new StringBuilder();
-    mangledName.append(class).append("$");
+    mangledName.append(cl).append("$");
     mangledName.append(method).append("$").append(formal).append("$");
-    return mangledName.toStrign();
+    return mangledName.toString();
   }
   public static void addStringsAsGlobal(){
     GlobalData.out.println("");
@@ -200,7 +201,7 @@ public class GlobalData{
     while (it.hasNext()) {
         Map.Entry pair = (Map.Entry)it.next();
         ir.append("@globalstring").append(pair.getValue())
-        .append(" = private unnamed_addr constant [").append(pair.getKey().length() + 1)
+        .append(" = private unnamed_addr constant [").append((pair.getKey()).length() + 1)
         .append(" x i8] c\"").append(pair.getKey()).append("\\00\", align 1\n");
     }
     GlobalData.out.println(ir.toString());
@@ -209,8 +210,8 @@ public class GlobalData{
   		strCounter = 0;
   		loopCounter = 0;
       ifCounter = 0;
-  		attrIndexMap = new Hashmap<String, int>();
-  		strConsToRegister = new Map<String, int>();
+  		attrIndexMap = new HashMap<String, Integer>();
+  		strConsToRegister = new HashMap<String, Integer>();
         classTable = new HashMap<String, String>();
         attrScopeTable = new ScopeTable<String>();
   		methodScopeTable = new ScopeTable<String>();

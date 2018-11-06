@@ -1,12 +1,11 @@
 package cool;
-
+import java.util.*;
+import java.io.PrintWriter;
 public class Default{
 
-  public static void addMethods(){
+  
 
-  }
-
-  public static void setDefualtClassSizes(){
+  public static void setDefaultClassSizes(){
     GlobalData.classNameToSize.put("Object",0);
     GlobalData.classNameToSize.put("IO",0);
     GlobalData.classNameToSize.put("Int",4);
@@ -122,9 +121,9 @@ public class Default{
     //method to report divide by 0 error
     GlobalData.out.println("define void @reportError0(){");
     GlobalData.out.println("entry:");
-    String error = IRInstrucions.addGEPInstruction(GLobalData.Const.ZERO_ERROR);
-    String s = IRInstrucions.addGEPInstruction("%s");
-    GLobalData.out.print("%r = call i32 (i8*, ...) @printf(i8* ");
+    String error = IRInstructions.addGEPInstruction(GlobalData.Const.ZERO_ERROR);
+    String s = IRInstructions.addGEPInstruction("%s");
+    GlobalData.out.print("%r = call i32 (i8*, ...) @printf(i8* ");
     GlobalData.out.print(s);
     GlobalData.out.print(", i8* ");
     GlobalData.out.print(error);
@@ -134,9 +133,9 @@ public class Default{
     //method to report dispatch on void error
     GlobalData.out.println("define void @reportErrorVoid(){");
     GlobalData.out.println("entry:");
-    String error = IRInstrucions.addGEPInstruction(GLobalData.Const.VOID_ERROR);
-    String s = IRInstrucions.addGEPInstruction("%s");
-    GLobalData.out.print("%r = call i32 (i8*, ...) @printf(i8* ");
+    error = IRInstructions.addGEPInstruction(GlobalData.Const.VOID_ERROR);
+    s = IRInstructions.addGEPInstruction("%s");
+    GlobalData.out.print("%r = call i32 (i8*, ...) @printf(i8* ");
     GlobalData.out.print(s);
     GlobalData.out.print(", i8* ");
     GlobalData.out.print(error);
@@ -208,16 +207,16 @@ public class Default{
       GlobalData.strConsToRegister.put("Main", GlobalData.strCounter);
       GlobalData.strCounter++;
     }
-    if(!GlobalData.strConsToRegister.containsKey(GLobalData.Const.ZERO_ERROR)){
-      GlobalData.strConsToRegister.put(GLobalData.Const.ZERO_ERROR, GlobalData.strCounter);
+    if(!GlobalData.strConsToRegister.containsKey(GlobalData.Const.ZERO_ERROR)){
+      GlobalData.strConsToRegister.put(GlobalData.Const.ZERO_ERROR, GlobalData.strCounter);
       GlobalData.strCounter++;
     }
-    if(!GlobalData.strConsToRegister.containsKey(GLobalData.Const.VOID_ERROR)){
-      GlobalData.strConsToRegister.put(GLobalData.Const.VOID_ERROR, GlobalData.strCounter);
+    if(!GlobalData.strConsToRegister.containsKey(GlobalData.Const.VOID_ERROR)){
+      GlobalData.strConsToRegister.put(GlobalData.Const.VOID_ERROR, GlobalData.strCounter);
       GlobalData.strCounter++;
     }
-    if(!GlobalData.strConsToRegister.containsKey(GLobalData.Const.ABORT)){
-      GlobalData.strConsToRegister.put(GLobalData.Const.ABORT, GlobalData.strCounter);
+    if(!GlobalData.strConsToRegister.containsKey(GlobalData.Const.ABORT)){
+      GlobalData.strConsToRegister.put(GlobalData.Const.ABORT, GlobalData.strCounter);
       GlobalData.strCounter++;
     }
   }
