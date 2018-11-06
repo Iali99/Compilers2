@@ -53,6 +53,12 @@ public class InheritanceGraph{
     return graph.containsKey(classname);
   }
 
+  //
+  public AST.class_ getClass(String classname)
+  {
+    return graph.get(classname);
+  }
+
   //insert a class in the inheritance graph.
   public void insert(AST.class_ c){
      graph.put(c.name,c);

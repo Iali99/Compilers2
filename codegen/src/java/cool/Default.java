@@ -3,7 +3,7 @@ import java.util.*;
 import java.io.PrintWriter;
 public class Default{
 
-  
+
 
   public static void setDefaultClassSizes(){
     GlobalData.classNameToSize.put("Object",0);
@@ -146,17 +146,15 @@ public class Default{
 
   //add c declatarions to IR
   public static void addCdecls(){
-    StringBuilder ir = new StringBuilder();
-    ir.append("declare i32 @printf(i8*, ...)\n\n");
-    ir.append("declare i32 @scanf(i8*, ...)\n\n");
-    ir.append("declare void @exit(i32)\n\n");
-    ir.append("declare i8* @malloc(i64)\n\n");
-    ir.append("declare i64 @strlen(i8*)\n\n");
-    ir.append("declare i32 @strcmp(i8*, i8*)\n\n");
-    ir.append("declare i8* @strcat(i8*, i8*)\n\n");
-    ir.append("declare i8* @strcpy(i8*, i8*)\n\n");
-    ir.append("declare i8* @strncpy(i8*, i8*, i32)\n\n");
-    GlobalData.out.println(ir.toString());
+    GlobalData.out.println("declare i32 @printf(i8*, ...)\n\n");
+    GlobalData.out.println("declare i32 @scanf(i8*, ...)\n\n");
+    GlobalData.out.println("declare void @exit(i32)\n\n");
+    GlobalData.out.println("declare i8* @malloc(i64)\n\n");
+    GlobalData.out.println("declare i64 @strlen(i8*)\n\n");
+    GlobalData.out.println("declare i32 @strcmp(i8*, i8*)\n\n");
+    GlobalData.out.println("declare i8* @strcat(i8*, i8*)\n\n");
+    GlobalData.out.println("declare i8* @strcpy(i8*, i8*)\n\n");
+    GlobalData.out.println("declare i8* @strncpy(i8*, i8*, i32)\n\n");
   }
   public static void addDefaultStrings(){
     if(!GlobalData.strConsToRegister.containsKey("%1024[^\n]")){

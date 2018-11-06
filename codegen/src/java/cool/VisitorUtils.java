@@ -8,8 +8,8 @@ public class VisitorUtils{
         GlobalData.out.println("; Struct declarations");
         GlobalData.out.println(GlobalData.makeStructName(GlobalData.Const.ROOT_TYPE) + " = type {i8*}");
 
-        for(AST.class_ cl: GlobalData.ROOT_CLASS.children) {
-            addStructsAllClassesDFS(cl);
+        for(String cl: GlobalData.ROOT_CLASS.children) {
+            addStructsAllClassesDFS(GlobalData.inheritanceGraph.getClass(cl));
         }
         GlobalData.out.println();
 	}
@@ -31,12 +31,12 @@ public class VisitorUtils{
     	}
     	ir.append("}");
     	GlobalData.out.println(ir.toString());
-    	for(AST.class_ child: cl.children) {
-            addStructsAllClassesDFS(child);
+    	for(String child: cl.children){
+            addStructsAllClassesDFS(GlobalData.inheritanceGraph.getClass(child));
         }
 	}
 
-	public void addConstructorAllClassesDFS(AST.class_ cl){
+	public static void addConstructorAllClassesDFS(AST.class_ cl){
 		Visitor.thisClass = cl;
 		// make constructor for cl
 		StringBuilder ir = new StringBuilder("define void ");
@@ -47,7 +47,7 @@ public class VisitorUtils{
 		GlobalData.out.println("entry:");
 		// add parent constructors
         if(cl.parent!=null) {
-            String regNew = IRInstructions.addConvertInstruction("bitcast", Global.currentClass, cl.parent, "%this");
+            String regNew = IRInstructions.addConvertInstruction("bitcast", Visitor.thisClass.name, cl.parent, "%this");
             IRInstructions.callConstructorInstruction(cl.parent, regNew);
         }
 		// visit attributes
@@ -61,8 +61,8 @@ public class VisitorUtils{
 		GlobalData.out.println("}");
 		GlobalData.out.println();
 		// make constructor for all other classes DFS
-		for(AST.class_ c : cl.children){
-			addConstructorAllClassesDFS(c);
+		for(String c : cl.children){
+			addConstructorAllClassesDFS(GlobalData.inheritanceGraph.getClass(c));
 		}
 	}
 
@@ -78,8 +78,8 @@ public class VisitorUtils{
 		GlobalData.out.println("}");
 		GlobalData.out.println();
 		// make constructor for all other classes DFS
-		for(AST.class_ cl : GlobalData.ROOT_CLASS.children){
-			addConstructorAllClassesDFS(cl);
+		for(String cl : GlobalData.ROOT_CLASS.children){
+			addConstructorAllClassesDFS(GlobalData.inheritanceGraph.getClass(cl));
 		}
 	}
 
@@ -89,8 +89,8 @@ public class VisitorUtils{
         	Visitor.visitMethods(node);
         }
         // iterate through all the child nodes
-        for(AST.class_ child: node.children) {
-            visitAllClassesDFS(child);
+        for(String child: node.children) {
+            visitAllClassesDFS(GlobalData.inheritanceGraph.getClass(child));
         }
         GlobalData.attrScopeTable.exitScope();
     }

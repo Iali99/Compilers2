@@ -212,10 +212,11 @@ public class GlobalData{
       ifCounter = 0;
   		attrIndexMap = new HashMap<String, Integer>();
   		strConsToRegister = new HashMap<String, Integer>();
-        classTable = new HashMap<String, String>();
-        attrScopeTable = new ScopeTable<String>();
+      classTable = new HashMap<String, String>();
+      attrScopeTable = new ScopeTable<String>();
   		methodScopeTable = new ScopeTable<String>();
       formalsMangledList = new ArrayList<String>();
+      classNameToSize = new HashMap<String,Integer>();
     }
 
 }
